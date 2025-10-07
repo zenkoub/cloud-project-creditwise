@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Grade Entry | Credit Wise</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-title"><div class="hat"></div><div>Credit&nbsp;Wise</div></div>
+      <a class="side-btn" href="dashboard.html">Dashboard</a>
+      <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
+      <a class="side-btn active" href="grade-entry.html">Grade Entry</a>
+      <a class="side-btn" href="planner.html">Planner</a>
+      <a class="side-btn" href="index.html">Sign out</a>
+    </aside>
+
+    <main>
+      <div class="page-head">
+        <h2 style="margin:0;color:#fff">Grade Entry</h2>
+        <div class="badge">Peerapat • 66070138</div>
+      </div>
+
+      <div class="card">
+        <div class="toolbar">
+          <label>Year
+            <select class="sel"><option>Year 1</option><option selected>Year 2</option></select>
+          </label>
+          <label>Semester
+            <select class="sel"><option>1</option><option selected>2</option></select>
+          </label>
+          <label>Module
+            <select class="sel"><option selected>Information Technology Infrastructure</option></select>
+          </label>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th style="width:10%">Year</th>
+              <th style="width:10%">Semester</th>
+              <th style="width:12%">Course Code</th>
+              <th>Course Name</th>
+              <th style="width:8%">Credit</th>
+              <th style="width:40%">Grade</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- แสดงเป็นตัวอย่าง Static -->
+            <tr>
+              <td>Year 2</td><td>2</td><td>06016401</td>
+              <td>MATHEMATICS FOR INFORMATION TECHNOLOGY</td><td>3</td>
+              <td><div class="pill">
+                <input id="g1A" type="radio" name="g1"><label for="g1A">A</label>
+                <input id="g1Bp" type="radio" name="g1" checked><label for="g1Bp">B+</label>
+                <input id="g1B" type="radio" name="g1"><label for="g1B">B</label>
+                <input id="g1C" type="radio" name="g1"><label for="g1C">C</label>
+                <input id="g1F" type="radio" name="g1"><label for="g1F">F</label>
+              </div></td>
+            </tr>
+            <tr>
+              <td>Year 2</td><td>2</td><td>06016411</td>
+              <td>INTRODUCTION TO COMPUTER SYSTEMS</td><td>3</td>
+              <td><div class="pill">
+                <input id="g2A" type="radio" name="g2"><label for="g2A">A</label>
+                <input id="g2Bp" type="radio" name="g2" checked><label for="g2Bp">B+</label>
+                <input id="g2B" type="radio" name="g2"><label for="g2B">B</label>
+                <input id="g2F" type="radio" name="g2"><label for="g2F">F</label>
+              </div></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="ft">
+          <div class="stat"><div style="color:#6a7fb7;font-weight:800">CREDIT</div><b>18 / 21</b></div>
+          <div class="stat"><div style="color:#6a7fb7;font-weight:800">GPS</div><b>3.00</b></div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

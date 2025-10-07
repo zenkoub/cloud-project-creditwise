@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Planner | Credit Wise</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body class="bg">
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="side-title"><div class="hat"></div><div>Credit&nbsp;Wise</div></div>
+      <a class="side-btn" href="dashboard.html">Dashboard</a>
+      <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
+      <a class="side-btn" href="grade-entry.html">Grade Entry</a>
+      <a class="side-btn active" href="planner.html">Planner</a>
+      <a class="side-btn" href="index.html">Sign out</a>
+    </aside>
+
+    <main>
+      <div class="page-head">
+        <h2 style="margin:0;color:#fff">Grade Planner</h2>
+        <div class="badge">Peerapat • 66070138</div>
+      </div>
+
+      <div class="hdr">Course Code &nbsp;&nbsp; Course Name &nbsp;&nbsp; Credit &nbsp;&nbsp; Score &nbsp;&nbsp; Grade</div>
+
+      <div class="list-card">
+        <div class="rowx">
+          <div><b>06016401</b></div>
+          <div style="font-size:13px">MATHEMATICS FOR INFORMATION TECHNOLOGY</div>
+          <div>3</div><div>78</div><div><b>B+</b></div><div>•••</div>
+        </div>
+      </div>
+      <div class="list-card">
+        <div class="rowx">
+          <div><b>06016411</b></div>
+          <div style="font-size:13px">INTRODUCTION TO COMPUTER SYSTEMS</div>
+          <div>3</div><div>78</div><div><b>B+</b></div><div>•••</div>
+        </div>
+      </div>
+
+      <div class="center"><button class="addbtn" id="openAdd">＋ ADD</button></div>
+
+      <div class="est">Estimated GPS : <span id="gps">3.50</span></div>
+    </main>
+  </div>
+
+  <!-- Modal (คำนวณแบบ client-side) -->
+  <dialog id="dlg">
+    <div class="modal">
+      <div class="modal-h">Grade Calculator</div>
+      <form class="modal-b" id="calcForm">
+        <div class="grid2">
+          <input class="ip" name="course_code" placeholder="Course Code" required />
+          <input class="ip" name="course_name" placeholder="Course Name" required />
+          <input class="ip" name="credit" type="number" min="0" step="1" placeholder="Credit" required />
+        </div>
+        <div class="radio" style="margin:6px 0 10px">
+          <div>Grading Scale:</div>
+          <label><input type="radio" name="grading_scale" value="AF" checked /> Standard A-F</label>
+          <label><input type="radio" name="grading_scale" value="SU" /> S/U Grading</label>
+        </div>
+
+        <div class="components">
+          <div class="comp-row" style="font-weight:800;color:#1b2b57">
+            <div>Component</div><div>Weight (%)</div><div>Score</div><div>Max</div><div></div>
+          </div>
+          <div id="compZone"></div>
+          <button type="button" class="pill-btn" id="addComp">ADD Component</button>
+        </div>
+
+        <div id="result" style="text-align:center;margin-top:14px;font-weight:800">
+          Total Score : — &nbsp;&nbsp; Estimated Grade : —
+        </div>
+
+        <div class="right">
+          <button type="button" class="calc" id="calcBtn">Calculate</button>
+          <button type="button" class="calc save" id="saveBtn">Save</button>
+          <button type="button" class="calc exit" id="closeBtn">Exit</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
