@@ -14,26 +14,49 @@
       <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
       <a class="side-btn active" href="grade-entry.html">Grade Entry</a>
       <a class="side-btn" href="planner.html">Planner</a>
-      <a class="side-btn" href="index.html">Sign out</a>
+      <a class="side-btn-bottom" href="index.html">Sign out</a>
     </aside>
 
     <main>
-      <div class="page-head">
-        <h2 style="margin:0;color:#fff">Grade Entry</h2>
-        <div class="badge">Peerapat • 66070138</div>
+      <div class="page-head" style="margin-top: 5%;">
+      <i></i>
+      <div class="badge">Peerapat Meesangngoen • 66070138</div>
       </div>
+      <div class="page-head">
+        <h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Grade Entry</h2>
+        <div style="color: #040431;">Track: Information Technology Infrastructure</div>
+      </div>
+
 
       <div class="card">
         <div class="toolbar">
-          <label>Year
-            <select class="sel"><option>Year 1</option><option selected>Year 2</option></select>
-          </label>
-          <label>Semester
-            <select class="sel"><option>1</option><option selected>2</option></select>
-          </label>
-          <label>Module
-            <select class="sel"><option selected>Information Technology Infrastructure</option></select>
-          </label>
+          <label>
+            <h4>Year <select class="sel">
+              <option>1</option>
+              <option selected>2</option>
+              <option selected>3</option>
+              <option selected>4</option>
+            </select>
+          </h4>
+        </label>
+        <label>
+          <h4>Semester
+            <select class="sel">
+              <option>1</option>
+              <option selected>2</option>
+              <option selected>summer</option>
+            </select>
+          </h4>
+        </label>
+        <label>
+          <h4>Module
+            <select class="sel">
+              <option selected>Software Development</option>
+              <option selected>Information Technology Infrastructure</option>
+              <option selected>Multimedia for Interactive Media, Web and Game Development</option>
+          </select>
+          </h4>
+        </label>
         </div>
 
         <table>
@@ -41,10 +64,10 @@
             <tr>
               <th style="width:10%">Year</th>
               <th style="width:10%">Semester</th>
-              <th style="width:12%">Course Code</th>
-              <th>Course Name</th>
-              <th style="width:8%">Credit</th>
-              <th style="width:40%">Grade</th>
+              <th style="width:15%">Course Code</th>
+              <th style="width:50%">Course Name</th>
+              <th style="width:13%">Credit</th>
+              <th style="width:45%">Grade</th>
             </tr>
           </thead>
           <tbody>
@@ -52,23 +75,57 @@
             <tr>
               <td>Year 2</td><td>2</td><td>06016401</td>
               <td>MATHEMATICS FOR INFORMATION TECHNOLOGY</td><td>3</td>
-              <td><div class="pill">
-                <input id="g1A" type="radio" name="g1"><label for="g1A">A</label>
-                <input id="g1Bp" type="radio" name="g1" checked><label for="g1Bp">B+</label>
-                <input id="g1B" type="radio" name="g1"><label for="g1B">B</label>
-                <input id="g1C" type="radio" name="g1"><label for="g1C">C</label>
-                <input id="g1F" type="radio" name="g1"><label for="g1F">F</label>
-              </div></td>
-            </tr>
+             <td>
+                <select class="grade">
+                  <option value="A">A</option>
+                  <option value="B+">B+</option>
+                  <option value="B">B</option>
+                  <option value="C+">C+</option>
+                  <option value="C">C</option>
+                  <option value="D+">D+</option>
+                  <option value="D">D</option>
+                  <option value="F">F</option>
+                  <option value="W">W</option>
+                  <option value="S">S</option>
+                  <option value="U">U</option>
+                </select>
+              </td>
             <tr>
               <td>Year 2</td><td>2</td><td>06016411</td>
               <td>INTRODUCTION TO COMPUTER SYSTEMS</td><td>3</td>
-              <td><div class="pill">
-                <input id="g2A" type="radio" name="g2"><label for="g2A">A</label>
-                <input id="g2Bp" type="radio" name="g2" checked><label for="g2Bp">B+</label>
-                <input id="g2B" type="radio" name="g2"><label for="g2B">B</label>
-                <input id="g2F" type="radio" name="g2"><label for="g2F">F</label>
-              </div></td>
+              <td>
+                <select class="grade">
+                  <option value="A">A</option>
+                  <option value="B+">B+</option>
+                  <option value="B">B</option>
+                  <option value="C+">C+</option>
+                  <option value="C">C</option>
+                  <option value="D+">D+</option>
+                  <option value="D">D</option>
+                  <option value="F">F</option>
+                  <option value="W">W</option>
+                  <option value="S">S</option>
+                  <option value="U">U</option>
+                </select>
+              </td>
+            <tr>
+              <td>Year 2</td><td>2</td><td>06016411</td>
+              <td>INTRODUCTION TO COMPUTER SYSTEMS</td><td>3</td>
+              <td>
+                <select class="grade">
+                  <option value="A">A</option>
+                  <option value="B+">B+</option>
+                  <option value="B">B</option>
+                  <option value="C+">C+</option>
+                  <option value="C">C</option>
+                  <option value="D+">D+</option>
+                  <option value="D">D</option>
+                  <option value="F">F</option>
+                  <option value="W">W</option>
+                  <option value="S">S</option>
+                  <option value="U">U</option>
+                </select>
+              </td>
             </tr>
           </tbody>
         </table>
