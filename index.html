@@ -31,16 +31,25 @@
 
   <script src="app.js"></script>
   <script>
-    // mock login → ไปหน้า dashboard
-    document.getElementById('loginForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      window.location.href="dashboard.html";
-    });
-    document.getElementById('toggle').onclick = ()=>{
-      const p = document.getElementById('pass');
-      p.type = p.type === 'password' ? 'text' : 'password';
-      toggle.textContent = p.type === 'password' ? 'แสดง' : 'ซ่อน';
-    };
+  document.getElementById('loginForm').addEventListener('submit', e=>{
+    e.preventDefault();
+    const user = document.getElementById('user').value.trim();
+    const pass = document.getElementById('pass').value.trim();
+
+    // ตรวจ role จาก user
+    let role;
+    if (user.toLowerCase() === 'admin') {
+      role = 'admin';
+      localStorage.setItem('cw_role', role);
+      window.location.href = 'admin-students.html';  // ไปหน้า admin โดยตรง
+    } else {
+      role = 'student';
+      localStorage.setItem('cw_role', role);
+      localStorage.setItem('cw_user', user);
+      window.location.href = 'dashboard.html'; // ไปหน้า student
+    }
+  });
   </script>
+
 </body>
 </html>
