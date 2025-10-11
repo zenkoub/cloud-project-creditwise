@@ -61,6 +61,8 @@ main {
 .side-btn.active{background:#fff; color:#0e47aa; font-weight:800}
 .side-btn-bottom{display:flex; align-items:center;position: relative; top: 35%; gap:10px; width:100%; padding:12px 12px; margin:8px 0; border-radius:12px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#e9f1ff; text-decoration:none}
 .side-btn-bottom:hover{background:rgba(255,255,255,.12)}
+.side-btn-bottom-ad{display:flex; align-items:center;position: relative; top:13em; gap:10px; width:100%; padding:12px 12px; margin:8px 0; border-radius:12px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.06); color:#e9f1ff; text-decoration:none}
+.side-btn-bottom-ad:hover{background:rgba(255,255,255,.12)}
 
 .page-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:12px}
 .badge{background:#edf3ff; color:#1849b0; padding:6px 10px; border-radius:10px; font-size:12px; font-weight:700}

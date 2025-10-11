@@ -46,6 +46,9 @@
     window.addEventListener('resize', drawChart);
   </script>
 </head>
+<style>
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  </style>
 <body class="bg">
   <div class="layout">
     <aside class="sidebar">
@@ -53,17 +56,13 @@
       <a class="side-btn active" href="admin-dashboard.html">Dashboard</a>
       <a class="side-btn" href="admin-students.html">Student Management</a>
       <a class="side-btn" href="admin-curriculum.html">Curriculum Management</a>
-      <a class="side-btn" href="index.html" onclick="localStorage.clear()">Sign out</a>
+      <a class="side-btn-bottom-ad" href="index.html" onclick="localStorage.clear()">Sign out</a>
     </aside>
 
     <main>
-      <div class="page-head">
-      <i></i>
-      <div class="badge">Peerapat Meesangngoen • 66070138</div>
-      </div>
-      <div class="page-head">
-        <h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Dashboard</h2>
-        <div style="color: #040431;">Track: Information Technology Infrastructure</div>
+      <div class="topbar">
+        <h2 style="margin:0;color:#fff">Dashboard</h2>
+        <div class="badge">Admin Panel</div>
       </div>
     
       <div class="panel">

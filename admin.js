@@ -1,66 +1,106 @@
-// ข้อมูลตัวอย่าง + ฟังก์ชันเก็บ/อ่านจาก localStorage
+// admin.js
+
 (function(global){
-  const KEY_STU = 'cw_students';
-  const KEY_CRS = 'cw_courses';
+    const KEY_STU = 'cw_students';
+    
+    let courseList = []; 
+    let nextId = 1;
 
-  function seed(){
-    if(!localStorage.getItem(KEY_STU)){
-      const students = [
-        { name:'Peerapat', surname:'Meesangngoen', email:'66070138@kmitl.ac.th', credit:33, gpa:3.10, status:'Normal', statusCls:'pass' },
-        { name:'Thanakorn', surname:'W.', email:'66070xxx@kmitl.ac.th', credit:28, gpa:2.85, status:'Normal', statusCls:'pass' },
-        { name:'Jirapat', surname:'K.', email:'66070yyy@kmitl.ac.th', credit:18, gpa:1.95, status:'Probation', statusCls:'fail' },
-      ];
-      localStorage.setItem(KEY_STU, JSON.stringify(students));
+    // Helper: สร้าง List Course จาก MASTER_CURRICULUM (รันครั้งเดียว)
+    function initializeMasterCourses() {
+        if (!global.MASTER_CURRICULUM) {
+             // ถ้าเรียกใช้เร็วเกินไป
+             return [];
+        }
+        
+        let tempCourseList = [];
+        let currentId = 1;
+        
+        const masterData = global.MASTER_CURRICULUM;
+        const allTracks = ['CORE', ...Object.keys(masterData).filter(k => k !== 'CORE')];
+
+        for (const trackId of allTracks) {
+            const trackData = masterData[trackId];
+            if (!trackData) continue;
+
+            for (const yearKey in trackData) {
+                for (const semesterKey in trackData[yearKey]) {
+                    const courses = trackData[yearKey][semesterKey];
+                    
+                    courses.forEach(c => {
+                        const uniqueIdentifier = `${c.code}-${yearKey}-${semesterKey}-${trackId}`;
+                        
+                        const isDuplicate = tempCourseList.some(existing => existing.identifier === uniqueIdentifier);
+                        if (trackId !== 'CORE' && isDuplicate) return;
+
+                        const yearNum = parseInt(yearKey.replace('Year ', ''));
+                        let semMatch = semesterKey.match(/\d/);
+                        const semesterNum = semMatch ? parseInt(semMatch[0]) : 0; 
+
+                        tempCourseList.push({
+                            id: currentId++,
+                            identifier: uniqueIdentifier, 
+                            year: yearNum,
+                            semester: semesterNum,
+                            code: c.code,
+                            name: c.name,
+                            credit: c.credit,
+                            capacity: c.capacity || 80, 
+                            enroll: c.enroll || 0,
+                            type: c.type || 'N/A',
+                            track: trackId, 
+                            semester_key: semesterKey 
+                        });
+                    });
+                }
+            }
+        }
+        courseList = tempCourseList;
+        nextId = currentId;
     }
-    if(!localStorage.getItem(KEY_CRS)){
-      const courses = [
-        { id:1, year:1, semester:1, code:'06016401', name:'MATHEMATICS FOR INFORMATION TECHNOLOGY', credit:3, capacity:80, enroll:27 },
-        { id:2, year:1, semester:1, code:'06016402', name:'INFORMATION TECHNOLOGY FUNDAMENTALS', credit:3, capacity:80, enroll:25 },
-        { id:3, year:1, semester:1, code:'06016411', name:'INTRODUCTION TO COMPUTER SYSTEMS', credit:3, capacity:75, enroll:39 },
-        { id:4, year:1, semester:1, code:'06086303', name:'PROBLEM SOLVING AND COMPUTER PROGRAMMING', credit:3, capacity:120, enroll:60 },
-        { id:5, year:1, semester:1, code:'90641001', name:'CHARM SCHOOL', credit:1, capacity:80, enroll:75 },
-        { id:6, year:1, semester:1, code:'90644007', name:'FOUNDATION ENGLISH I', credit:3, capacity:80, enroll:70 },
-        { id:7, year:1, semester:2, code:'06016401', name:'MATHEMATICS FOR INFORMATION TECHNOLOGY', credit:3, capacity:80, enroll:27 },
-        { id:8, year:1, semester:2, code:'06016402', name:'INFORMATION TECHNOLOGY FUNDAMENTALS', credit:3, capacity:80, enroll:66 },
-        { id:9, year:1, semester:2, code:'9064XXXX', name:'ELECTIVE COURSE IN GENERAL EDUCATION I', credit:3, capacity:80, enroll:70 },
-      ];
-      localStorage.setItem(KEY_CRS, JSON.stringify(courses));
+
+    // Logic Seeding Student (ใช้ localStorage)
+    function seed() {
+        if (!localStorage.getItem(KEY_STU)){
+            const students = [
+                { id: 1, name:'Peerapat', surname:'Meesangngoen', email:'66070138@kmitl.ac.th', credit:33, gpa:3.10, status:'Normal', statusCls:'pass' },
+                { id: 2, name:'Thanakorn', surname:'W.', email:'66070xxx@kmitl.ac.th', credit:28, gpa:2.85, status:'Normal', statusCls:'pass' },
+                { id: 3, name:'Jirapat', surname:'K.', email:'66070yyy@kmitl.ac.th', credit:18, gpa:1.95, status:'Probation', statusCls:'fail' },
+            ];
+            localStorage.setItem(KEY_STU, JSON.stringify(students));
+        }
+        
+        // 🚀 เรียกใช้ initialization Master Courses ทันทีถ้าข้อมูล Master พร้อม
+        if (global.MASTER_CURRICULUM) {
+             initializeMasterCourses();
+        }
     }
-  }
-  seed();
+    
+    document.addEventListener('DOMContentLoaded', seed);
 
-  function getStudents(){
-    return JSON.parse(localStorage.getItem(KEY_STU) || '[]');
-  }
+    function getCourses(){
+        // 🚀 บังคับ initialize ถ้า courseList ยังว่าง (แก้ปัญหา Timing)
+        if (courseList.length === 0 && global.MASTER_CURRICULUM) {
+             initializeMasterCourses();
+        }
+        return courseList.sort((a,b)=> a.year-b.year || a.semester-b.semester || a.code.localeCompare(b.code));
+    }
+    
+    // ... (ส่วน CRUD อื่นๆ และ getStudents ยังคงเดิม) ...
 
-  function getCourses(){
-    const arr = JSON.parse(localStorage.getItem(KEY_CRS) || '[]');
-    // เรียง Year, Semester, Code
-    return arr.sort((a,b)=> a.year-b.year || a.semester-b.semester || a.code.localeCompare(b.code));
-  }
-  function saveCourses(arr){ localStorage.setItem(KEY_CRS, JSON.stringify(arr)); }
-  function nextId(arr){ return arr.length? Math.max(...arr.map(x=>x.id))+1 : 1; }
-
-  function addCourse(c){
-    const arr = getCourses();
-    c.id = nextId(arr);
-    arr.push(c); saveCourses(arr);
-  }
-  function updateCourse(c){
-    const arr = getCourses();
-    const i = arr.findIndex(x=>x.id===c.id);
-    if(i>=0){ arr[i]=c; saveCourses(arr); }
-  }
-  function deleteCourse(id){
-    const arr = getCourses().filter(x=>x.id!==id);
-    saveCourses(arr);
-  }
-
-  global.cwAdmin = {
-    getStudents,
-    getCourses,
-    addCourse,
-    updateCourse,
-    deleteCourse
-  };
+    global.cwAdmin = {
+        getStudents: () => JSON.parse(localStorage.getItem(KEY_STU) || '[]'),
+        getCourses,
+        addCourse: (c) => {
+            c.id = nextId++;
+            courseList.push(c); 
+        },
+        updateCourse: (c) => {
+            const i = courseList.findIndex(x=>x.id===c.id);
+            if(i>=0){ courseList[i]={...courseList[i], ...c}; }
+        },
+        deleteCourse: (id) => {
+            courseList = courseList.filter(x=>x.id!==id);
+        }
+    };
 })(window);
