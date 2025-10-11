@@ -1,110 +1,160 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Dashboard | Credit Wise</title>
-  <link rel="stylesheet" href="style.css" />
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script type="text/javascript">
-    google.charts.load('current', { packages: ['corechart'] });
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-      // ข้อมูล GPA และ GPS ต่อเทอม
-      var data = google.visualization.arrayToDataTable([
-        ['Term', 'GPS', 'GPA'],
-        ['1/68', 3.10, 3.10],
-        ['2/68', 2.48, 2.97],
-        ['1/69', 3.21, 3.09],
-        ['2/69', 4.00, 3.55],
-        ['1/70', 3.55, 3.55]
-      ]);
-
-      var options = {
-        legend: { position: 'bottom' },
-        curveType: 'function',
-        title: '',
-        chartArea: { left: 40, top: 10, width: '85%', height: '70%' },
-        colors: ['#1557d5', '#7ba8ff'],
-        lineWidth: 3,
-        backgroundColor: '#ffffff',
-        hAxis: { textStyle: { color: '#1b2b57' } },
-        vAxis: {
-          minValue: 0,
-          maxValue: 4,
-          ticks: [0, 1, 2, 3, 4],
-          textStyle: { color: '#1b2b57' }
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dashboard | Credit Wise</title>
+    <link rel="stylesheet" href="style.css" />
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    
+    <script src="curriculum-master.js"></script> 
+    <script src="user.js"></script>
+    
+    <script type="text/javascript">
+      google.charts.load('current', { packages: ['corechart'] });
+    
+    function drawChart(history) {
+        // ฟังก์ชันวาด Chart: จะถูกเรียกเฉพาะเมื่อ Google Charts พร้อม
+        if (typeof google === 'undefined' || !google.visualization || !google.visualization.arrayToDataTable) {
+             return;
         }
-      };
+        
+        var chartDataArray = [['Term', 'GPAX', 'GPA']]; 
+        
+        history.forEach(item => {
+            // ใช้ item.gpax (สะสม) และ item.term_gpa (รายเทอม)
+            chartDataArray.push([item.term, item.gpax, item.term_gpa]); 
+        });
 
-      var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
-      chart.draw(data, options);
+        var data = google.visualization.arrayToDataTable(chartDataArray);
+
+        var options = {
+            legend: { position: 'bottom' },
+            curveType: 'function',
+            title: '',
+            chartArea: { left: 40, top: 10, width: '85%', height: '70%' },
+            colors: ['#1557d5', '#7ba8ff'],
+            lineWidth: 3,
+            backgroundColor: '#ffffff',
+            hAxis: { textStyle: { color: '#1b2b57' } },
+            vAxis: {
+                minValue: 0,
+                maxValue: 4,
+                ticks: [0, 1, 2, 3, 4],
+                textStyle: { color: '#1b2b57' }
+            }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+        chart.draw(data, options);
     }
 
+   function updateDashboardInfo() {
+    const userData = getCurrentUserData();
+    const history = userData.academic_history || []; 
+    const trackId = userData.info.track_id;
+    
+    // เข้าถึง TRACKS_INFO จาก window
+    const trackName = window.TRACKS_INFO && window.TRACKS_INFO[trackId] 
+        ? window.TRACKS_INFO[trackId].full_name 
+        : 'N/A';
+
+    // ✅ อัปเดตชื่อและรหัสนักศึกษา
+    const badgeEl = document.getElementById('student-badge');
+    if (badgeEl) {
+        badgeEl.textContent = `${userData.info.name || 'N/A'} • ${userData.info.id || 'N/A'}`;
+    }
+
+    // ✅ อัปเดต Track
+    const trackEl = document.getElementById('student-track');
+    if (trackEl) {
+        trackEl.textContent = `Track: ${TRACKS_INFO[trackId].full_name}`;
+    }
+
+    // ✅ อัปเดต GPAX และ GPA ล่าสุด
+    const latest = history.length > 0 
+        ? history[history.length - 1] 
+        : { gpax: 0.00, term_gpa: 0.00 };
+    
+    document.querySelector('.dash-card.big:nth-child(1) .dash-value').textContent = 
+        latest.gpax.toFixed(2); 
+    document.querySelector('.dash-card.big:nth-child(2) .dash-value').textContent = 
+        latest.term_gpa.toFixed(2); 
+
+    // ✅ แสดงประวัติเกรด
+    const gradeListDiv = document.querySelector('.dash-card.grade-list .grades');
+    gradeListDiv.innerHTML = '';
+    [...history].reverse().forEach(item => { 
+        gradeListDiv.innerHTML += `
+            <div><span>${item.term}</span><b>${item.term_gpa.toFixed(2)}</b></div>
+        `;
+    });
+
+    // ✅ วาด Chart
+    google.charts.setOnLoadCallback(() => drawChart(history));
+}
+
     // Responsive resize
-    window.addEventListener('resize', drawChart);
-  </script>
+    window.addEventListener('resize', () => {
+         const userData = window.getCurrentUserData ? window.getCurrentUserData() : { academic_history: [] };
+         drawChart(userData.academic_history || []);
+    });
+
+    // 🚀 เรียกอัปเดตข้อมูลเมื่อ DOM โหลดเสร็จ (รวมถึงการวาด Chart ผ่าน Callback)
+    document.addEventListener('DOMContentLoaded', updateDashboardInfo);
+    </script>
 </head>
 <body class="bg">
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="side-title"><div class="hat"></div><div>Credit&nbsp;Wise</div></div>
-      <a class="side-btn active" href="dashboard.html">Dashboard</a>
-      <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
-      <a class="side-btn" href="grade-entry.html">Grade Entry</a>
-      <a class="side-btn" href="planner.html">Planner</a>
-      <a class="side-btn-bottom" href="index.html">Sign out</a>
-    </aside>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="side-title"><div class="hat"></div><div>Credit&nbsp;Wise</div></div>
+            <a class="side-btn active" href="dashboard.html">Dashboard</a>
+            <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
+            <a class="side-btn" href="grade-entry.html">Grade Entry</a>
+            <a class="side-btn" href="planner.html">Planner</a>
+            <a class="side-btn-bottom" href="index.html">Sign out</a>
+        </aside>
 
-    <main>
-      <div class="page-head">
-      <i></i>
-      <div class="badge">Peerapat Meesangngoen • 66070138</div>
-      </div>
-      <div class="page-head">
-        <h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Dashboard</h2>
-        <div style="color: #040431;">Track: Information Technology Infrastructure</div>
-      </div>
-    
-      <div class="panel">
-        <h3>Welcome to Credit Wise 🎓</h3>
-        <p>ใช้เมนูซ้ายเพื่อไปยังแต่ละหน้า: <b>Curriculum Plan</b>, <b>Grade Entry</b>, และ <b>Planner</b>.</p>
-        <p>นี่เป็นเวอร์ชัน Static สำหรับนำขึ้น AWS (ไม่มีฐานข้อมูล).</p>
-      </div>
+        <main>
+           <div class="page-head" style="margin-top: 5%;">
+                <i></i>
+                <div class="badge" id="student-badge"></div>
+            </div>
+            <div class="page-head">
+                <h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Dashboard</h2>
+                <div id="student-track" style="color: #040431;"></div>
+            </div>
+            
+        
+            <div class="panel">
+                <h3>Welcome to Credit Wise 🎓</h3>
+                <p>ใช้เมนูซ้ายเพื่อไปยังแต่ละหน้า: <b>Curriculum Plan</b>, <b>Grade Entry</b>, และ <b>Planner</b>.</p>
+                <p>ข้อมูลทั้งหมดถูกดึงจาก JavaScript และเป็นเวอร์ชัน Static สำหรับนำขึ้น AWS.</p>
+            </div>
 
 
-      <div class="dash-grid">
-        <!-- GPS -->
-        <div class="dash-card big">
-          <div class="dash-title">GPS</div>
-          <div class="dash-value">3.55</div>
-        </div>
+            <div class="dash-grid">
+                <div class="dash-card big">
+                    <div class="dash-title">GPAX</div>
+                    <div class="dash-value">—</div>
+                </div>
 
-        <!-- GPA -->
-        <div class="dash-card big">
-          <div class="dash-title">GPA</div>
-          <div class="dash-value">3.55</div>
-        </div>
+                <div class="dash-card big">
+                    <div class="dash-title">GPA</div>
+                    <div class="dash-value">—</div>
+                </div>
 
-        <!-- Chart -->
-        <div class="dash-card wide">
-          <div id="curve_chart" style="width:100%;height:300px;"></div>
-        </div>
+                <div class="dash-card wide">
+                    <div id="curve_chart" style="width:100%;height:300px;"></div>
+                </div>
 
-        <!-- Grade list -->
-        <div class="dash-card grade-list">
-          <div class="dash-title">Grade</div>
-          <div class="grades">
-            <div><span>1/68</span><b>3.10</b></div>
-            <div><span>2/68</span><b>2.48</b></div>
-            <div><span>1/69</span><b>3.21</b></div>
-            <div><span>2/69</span><b>4.00</b></div>
-            <div><span>1/70</span><b>3.55</b></div>
-          </div>
-        </div>
-      </div>
-    </main>
-  </div>
+                <div class="dash-card grade-list">
+                    <div class="dash-title">History</div>
+                    <div class="grades">
+                        </div>
+                </div>
+            </div>
+        </main>
+    </div>
 </body>
 </html>

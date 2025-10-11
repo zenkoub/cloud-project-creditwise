@@ -1,17 +1,19 @@
 <!doctype html>
 <html lang="th">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Credit Wise | Login</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body class="bg">
 
   <div class="brand">
-    <img class="logo" src="https://media.discordapp.net/attachments/1210496469539495967/1425175669096054834/logo.png?ex=68e6a1c5&is=68e55045&hm=625b6c352fbd3bb7b722cf4d0de15acf09a04e0f14018496bee31b5bcb92ee0d&=&format=webp&quality=lossless">
-  </div> 
-  
+    <img class="logo" src="/cloud-project-creditwise/logo.png">
+  </div>
+
   <main class="login-wrap">
     <div class="title">LOGIN</div>
     <form id="loginForm">
@@ -28,28 +30,48 @@
     </form>
     <p class="foot">© 2025 Credit Wise</p>
   </main>
-
-  <script src="app.js"></script>
+  <script src="user.js"></script>
+  
   <script>
-  document.getElementById('loginForm').addEventListener('submit', e=>{
-    e.preventDefault();
-    const user = document.getElementById('user').value.trim();
-    const pass = document.getElementById('pass').value.trim();
+    document.getElementById('loginForm').addEventListener('submit', e => {
+      e.preventDefault();
+      const user = document.getElementById('user').value.trim();
+      const pass = document.getElementById('pass').value.trim();
+      // ⚠️ NOTE: รหัสผ่าน 11111111 ถูกใช้เพื่อความสมจริง แต่ไม่มีการตรวจสอบจริงในโค้ดนี้
 
-    // ตรวจ role จาก user
-    let role;
-    if (user.toLowerCase() === 'admin') {
-      role = 'admin';
-      localStorage.setItem('cw_role', role);
-      window.location.href = 'admin-students.html';  // ไปหน้า admin โดยตรง
-    } else {
-      role = 'student';
-      localStorage.setItem('cw_role', role);
-      localStorage.setItem('cw_user', user);
-      window.location.href = 'dashboard.html'; // ไปหน้า student
-    }
-  });
+      // ตรวจ role จาก user
+      let role;
+      if (user.toLowerCase() === 'admin') {
+        role = 'admin';
+        localStorage.setItem('cw_role', role);
+        localStorage.setItem('cw_user', user); // เก็บ user 'admin'
+        window.location.href = 'admin-dashboard.html';
+      } else {
+        role = 'student';
+        // 🚀 ตรวจสอบว่า user ID มีอยู่ใน USER_DATA หรือไม่ (เพิ่มความสมจริง)
+        if (USER_DATA[user]) {
+          localStorage.setItem('cw_role', role);
+          localStorage.setItem('cw_user', user);
+          window.location.href = 'dashboard.html'; // ไปหน้า student
+        } else {
+          alert('User ID ไม่ถูกต้อง หรือไม่มีข้อมูลในระบบ');
+        }
+      }
+    });
+
+    // Code สำหรับปุ่มแสดงรหัสผ่าน (Toggle Password)
+    document.getElementById('toggle').onclick = function () {
+      const passInput = document.getElementById('pass');
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        this.textContent = 'ซ่อน';
+      } else {
+        passInput.type = 'password';
+        this.textContent = 'แสดง';
+      }
+    };
   </script>
 
 </body>
+
 </html>

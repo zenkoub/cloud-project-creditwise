@@ -1,141 +1,484 @@
 <!doctype html>
 <html lang="th">
+
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Grade Entry | Credit Wise</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Grade Entry | Credit Wise</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
+
 <body class="bg">
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="side-title"><div class="hat"></div><div>Credit&nbsp;Wise</div></div>
-      <a class="side-btn" href="dashboard.html">Dashboard</a>
-      <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
-      <a class="side-btn active" href="grade-entry.html">Grade Entry</a>
-      <a class="side-btn" href="planner.html">Planner</a>
-      <a class="side-btn-bottom" href="index.html">Sign out</a>
-    </aside>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="side-title">
+                <div class="hat"></div>
+                <div>Credit&nbsp;Wise</div>
+            </div>
+            <a class="side-btn" href="dashboard.html">Dashboard</a>
+            <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
+            <a class="side-btn active" href="grade-entry.html">Grade Entry</a>
+            <a class="side-btn" href="planner.html">Planner</a>
+            <a class="side-btn-bottom" href="index.html">Sign out</a>
+        </aside>
 
-    <main>
-      <div class="page-head" style="margin-top: 5%;">
-      <i></i>
-      <div class="badge">Peerapat Meesangngoen • 66070138</div>
-      </div>
-      <div class="page-head">
-        <h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Grade Entry</h2>
-        <div style="color: #040431;">Track: Information Technology Infrastructure</div>
-      </div>
+        <main>
+            <div class="page-head" style="margin-top: 5%;">
+                <i></i>
+                <div class="badge" id="student-badge"></div>
+            </div>
+            <div class="page-head">
+                <h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Grade Entry</h2>
+                <div id="student-track" style="color: #040431;"></div>
+            </div>
+
+            <div class="card">
+                <div class="toolbar">
+                    <label>
+                        <h4>Year <select class="sel" id="sel-year"></select></h4>
+                    </label>
+                    <label>
+                        <h4>Semester
+                            <select class="sel" id="sel-semester"></select>
+                        </h4>
+                    </label>
+                    <label>
+                        <h4>Module
+                            <select class="sel" id="sel-track" disabled></select>
+                        </h4>
+                    </label>
+                </div>
+
+                <table id="main-course-table">
+                    <thead>
+                        <tr>
+                            <th style="width:10%">Year</th>
+                            <th style="width:10%">Semester</th>
+                            <th style="width:15%">Course Code</th>
+                            <th style="width:40%">Course Name</th>
+                            <th style="width:10%">Credit</th>
+                            <th style="width:15%">Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="grade-entry-body">
+                    </tbody>
+                </table>
+
+                <div class="tbl-head" style="margin-top: 20px;">Elective Course Entry (วิชาเสรีที่เลือกเอง)</div>
+                <div class="sub-head" style="margin-bottom: 10px;">
+                    กรอกวิชาเสรีที่ถูกลงทะเบียนเพื่อเติม Slot ว่าง (ด้านบน) หรือเพิ่มเป็น Free Electives (ด้านล่าง)
+                </div>
+                <table id="elective-entry-table">
+                    <thead>
+                        <tr>
+                            <th style="width:15%">Type/Slot</th>
+                            <th style="width:15%">Code</th>
+                            <th style="width:30%">Name</th>
+                            <th style="width:10%">Credit</th>
+                            <th style="width:15%">Grade</th>
+                            <th style="width:10%">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="elective-entry-body">
+                    </tbody>
+                </table>
+                <button id="add-free-elective-btn" class="addbtn" style="margin-top: 10px; padding: 8px 15px;">+ Add Free
+                    Elective</button>
 
 
-      <div class="card">
-        <div class="toolbar">
-          <label>
-            <h4>Year <select class="sel">
-              <option>1</option>
-              <option selected>2</option>
-              <option selected>3</option>
-              <option selected>4</option>
-            </select>
-          </h4>
-        </label>
-        <label>
-          <h4>Semester
-            <select class="sel">
-              <option>1</option>
-              <option selected>2</option>
-              <option selected>summer</option>
-            </select>
-          </h4>
-        </label>
-        <label>
-          <h4>Module
-            <select class="sel">
-              <option selected>Software Development</option>
-              <option selected>Information Technology Infrastructure</option>
-              <option selected>Multimedia for Interactive Media, Web and Game Development</option>
-          </select>
-          </h4>
-        </label>
-        </div>
+                <div class="ft">
+                    <div class="stat">
+                        <div style="color:#6a7fb7;font-weight:800">TOTAL CREDIT (TERM)</div><b id="term-total-credit">0</b>
+                    </div>
+                    <div class="stat">
+                        <div style="color:#6a7fb7;font-weight:800">CREDIT EARNED (TERM)</div><b id="term-earned-credit">0</b>
+                    </div>
+                    <div class="stat">
+                        <div style="color:#6a7fb7;font-weight:800">GPA</div><b id="term-gpa">0.00</b>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
 
-        <table>
-          <thead>
-            <tr>
-              <th style="width:10%">Year</th>
-              <th style="width:10%">Semester</th>
-              <th style="width:15%">Course Code</th>
-              <th style="width:50%">Course Name</th>
-              <th style="width:13%">Credit</th>
-              <th style="width:45%">Grade</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- แสดงเป็นตัวอย่าง Static -->
-            <tr>
-              <td>Year 2</td><td>2</td><td>06016401</td>
-              <td>MATHEMATICS FOR INFORMATION TECHNOLOGY</td><td>3</td>
-             <td>
-                <select class="grade">
-                  <option value="A">A</option>
-                  <option value="B+">B+</option>
-                  <option value="B">B</option>
-                  <option value="C+">C+</option>
-                  <option value="C">C</option>
-                  <option value="D+">D+</option>
-                  <option value="D">D</option>
-                  <option value="F">F</option>
-                  <option value="W">W</option>
-                  <option value="S">S</option>
-                  <option value="U">U</option>
-                </select>
-              </td>
-            <tr>
-              <td>Year 2</td><td>2</td><td>06016411</td>
-              <td>INTRODUCTION TO COMPUTER SYSTEMS</td><td>3</td>
-              <td>
-                <select class="grade">
-                  <option value="A">A</option>
-                  <option value="B+">B+</option>
-                  <option value="B">B</option>
-                  <option value="C+">C+</option>
-                  <option value="C">C</option>
-                  <option value="D+">D+</option>
-                  <option value="D">D</option>
-                  <option value="F">F</option>
-                  <option value="W">W</option>
-                  <option value="S">S</option>
-                  <option value="U">U</option>
-                </select>
-              </td>
-            <tr>
-              <td>Year 2</td><td>2</td><td>06016411</td>
-              <td>INTRODUCTION TO COMPUTER SYSTEMS</td><td>3</td>
-              <td>
-                <select class="grade">
-                  <option value="A">A</option>
-                  <option value="B+">B+</option>
-                  <option value="B">B</option>
-                  <option value="C+">C+</option>
-                  <option value="C">C</option>
-                  <option value="D+">D+</option>
-                  <option value="D">D</option>
-                  <option value="F">F</option>
-                  <option value="W">W</option>
-                  <option value="S">S</option>
-                  <option value="U">U</option>
-                </select>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <script src="curriculum-master.js"></script>
+    <script src="user.js"></script>
+    <script>
+        const userData = getCurrentUserData();
+        const GRADE_OPTIONS = ['—', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F', 'W', 'S', 'U'];
 
-        <div class="ft">
-          <div class="stat"><div style="color:#6a7fb7;font-weight:800">CREDIT</div><b>18 / 21</b></div>
-          <div class="stat"><div style="color:#6a7fb7;font-weight:800">GPS</div><b>3.00</b></div>
-        </div>
-      </div>
-    </main>
-  </div>
+        function gradeToPoint(grade) {
+             const map = { "A": 4.0, "B+": 3.5, "B": 3.0, "C+": 2.5, "C": 2.0, "D+": 1.5, "D": 1.0, "F": 0.0, "W": 0.0, "S": 0.0, "U": 0.0, "—": 0.0 };
+             return map[grade] || 0.0;
+        }
+
+        function createGradeDropdown(courseIdentifier, currentGrade = '—') {
+            let optionsHtml = '';
+            GRADE_OPTIONS.forEach(g => {
+                const selected = (g === currentGrade || (currentGrade === '—' && g === '—')) ? 'selected' : '';
+                optionsHtml += `<option value="${g}" ${selected}>${g}</option>`;
+            });
+            return `<select class="grade" data-id="${courseIdentifier}" onchange="saveGrade(this)">${optionsHtml}</select>`;
+        }
+
+        function saveGrade(selectElement) {
+            const grade = selectElement.value;
+            const id = selectElement.getAttribute('data-id');
+            const isSlot = id.includes('_ELEC_');
+            let status = (grade === 'F' || grade === 'W' || grade === 'U' || grade === '—') ? grade : 'Passed';
+            if (grade === '—') status = '—';
+
+            if (isSlot) {
+                const row = selectElement.closest('tr');
+                const code = row.querySelector('[data-field="code"]').value;
+                const name = row.querySelector('[data-field="name"]').value;
+                const credit = parseInt(row.querySelector('[data-field="credit"]').value) || 3;
+
+                userData.user_electives[id] = { code, name, credit, grade, status, slot_id: id, is_user_entry_slot: true };
+
+            } else if (userData.grades.hasOwnProperty(id)) {
+                userData.grades[id].grade = grade;
+                userData.grades[id].status = status;
+            } else {
+                const freeElec = userData.free_electives.find(c => c.code === id);
+                if (freeElec) {
+                    freeElec.grade = grade;
+                    freeElec.status = status;
+                }
+            }
+            renderGradeEntryTable();
+        }
+
+        function checkCreditLimit(totalCredit, selectedYear, selectedSemester, remainingCredit, isFinalYear) {
+            const isNormalSem = selectedSemester !== 'summer';
+            
+            if (!isNormalSem) {
+                return;
+            }
+
+            if (isFinalYear || remainingCredit < 9) {
+                if (totalCredit > 27) {
+                    alert(`⚠️ เกินขีดจำกัดหน่วยกิตสูงสุด! คุณลงทะเบียน ${totalCredit} หน่วยกิต แต่ไม่ควรเกิน 27 หน่วยกิตในภาคการศึกษานี้`);
+                } else if (totalCredit === 0) {
+                     // alert(`⚠️ คุณไม่ได้ลงทะเบียนเรียนในภาคการศึกษานี้`);
+                }
+            } else {
+                if (totalCredit < 9) {
+                    alert(`⚠️ หน่วยกิตต่ำกว่าเกณฑ์! คุณลงทะเบียน ${totalCredit} หน่วยกิต กรุณาลงทะเบียนไม่น้อยกว่า 9 หน่วยกิต`);
+                } else if (totalCredit > 22) {
+                    alert(`⚠️ เกินขีดจำกัดหน่วยกิต! คุณลงทะเบียน ${totalCredit} หน่วยกิต กรุณาลงทะเบียนไม่เกิน 22 หน่วยกิต`);
+                }
+            }
+        }
+        
+        function updateStats(courses) {
+            let totalCreditAttempted = 0; 
+            let earnedCredit = 0; 
+            let totalCG = 0; 
+            
+            const remainingCredit = 144; 
+            const isFinalYear = (parseInt(document.getElementById('sel-year').value) === 4); 
+
+            courses.forEach(course => {
+                const credit = parseInt(course.credit);
+                
+                let grade = '—';
+                // 1. ดึงเกรดที่ถูกต้อง
+                if(course.is_user_entry_slot) {
+                     grade = userData.user_electives[course.slot_id] ? userData.user_electives[course.slot_id].grade : '—';
+                } else if (course.code.startsWith('FE')) {
+                     const fe = userData.free_electives.find(f => f.code === course.code);
+                     grade = fe ? fe.grade : '—';
+                } else {
+                     grade = userData.grades[course.code] ? userData.grades[course.code].grade : '—';
+                }
+                
+                const point = gradeToPoint(grade);
+
+                // 2. Total Credit Attempted (นับทั้งหมด)
+                totalCreditAttempted += credit; 
+                
+                // 3. Credit Earned (หน่วยกิตที่ผ่านจริง: ไม่ใช่ F, W, U, —)
+                if (grade !== 'W' && grade !== 'F' && grade !== 'U' && grade !== '—') { 
+                    earnedCredit += credit;
+                }
+                
+                // 4. Total Credit * Grade Point (ไม่รวม W, S, U)
+                if (grade !== 'W' && grade !== 'S' && grade !== 'U' && grade !== '—') {
+                    totalCG += credit * point;
+                }
+            });
+            
+            // 5. คำนวณ GPA รายเทอม (หักหน่วยกิตที่ไม่คิดเกรดออก)
+            const totalCreditForGPA = totalCreditAttempted - courses.filter(c => {
+                let grade = '—';
+                if(c.is_user_entry_slot) {
+                     grade = userData.user_electives[c.slot_id] ? userData.user_electives[c.slot_id].grade : '—';
+                } else if (c.code.startsWith('FE')) {
+                     const fe = userData.free_electives.find(f => f.code === c.code);
+                     grade = fe ? fe.grade : '—';
+                } else {
+                     grade = userData.grades[c.code] ? userData.grades[c.code].grade : '—';
+                }
+                
+                return grade === 'W' || grade === 'S' || grade === 'U' || grade === '—';
+            }).reduce((sum, c) => sum + parseInt(c.credit), 0);
+            
+            const termGPA = totalCreditForGPA > 0 ? (totalCG / totalCreditForGPA).toFixed(2) : '0.00';
+            
+            document.getElementById('term-total-credit').textContent = totalCreditAttempted;
+            document.getElementById('term-earned-credit').textContent = earnedCredit;
+            document.getElementById('term-gpa').textContent = termGPA;
+            
+            checkCreditLimit(totalCreditAttempted, document.getElementById('sel-year').value, document.getElementById('sel-semester').value, remainingCredit, isFinalYear);
+        }
+        
+        function getSemesterKey(year, semester, studyPlan) {
+            let semesterKey = `Semester ${semester}`;
+            if (semester.toLowerCase() === 'summer') semesterKey = 'Summer'; 
+            
+            if (year === "Year 3" || year === "Year 4") {
+                const suffix = ` (${studyPlan === "Co-op" ? 'Co-op' : 'Non-Co-op'})`;
+                
+                if (semester === "2" || semester.toLowerCase() === 'summer') {
+                    semesterKey = `Semester 2${suffix}`;
+                } else if (semester === "1" && year === "Year 4") {
+                    semesterKey = `Semester 1${suffix}`;
+                } else if (semester === "1" && year === "Year 3") {
+                    semesterKey = `Semester 1`;
+                }
+            }
+            return semesterKey;
+        }
+
+        function renderGradeEntryTable() {
+            const selectedYear = document.getElementById('sel-year').value;
+            const selectedSemester = document.getElementById('sel-semester').value;
+            const selectedTrackId = userData.info.track_id;
+            const studyPlan = userData.info.study_plan;
+            const masterCore = MASTER_CURRICULUM["CORE"];
+            const masterTrack = MASTER_CURRICULUM[selectedTrackId];
+            const tbody = document.getElementById('grade-entry-body');
+            
+            const yearKey = `Year ${selectedYear}`;
+            
+            // 1. ดึง Core Courses (ใช้ Key ที่ไม่มี Suffix)
+            const coreCourses = masterCore[yearKey] ? masterCore[yearKey][`Semester ${selectedSemester}`] || [] : [];
+            
+            // 2. ดึง Track Courses (ใช้ Key ที่มี Suffix)
+            const semesterKey = getSemesterKey(yearKey, selectedSemester, studyPlan);
+            const trackCourses = masterTrack[yearKey] ? masterTrack[yearKey][semesterKey] || [] : [];
+            
+            // 3. รวมวิชาทั้งหมดจาก Master
+            let courses = [
+                ...coreCourses, 
+                ...trackCourses.filter(tc => !coreCourses.some(cc => cc.code === tc.code))
+            ];
+            
+            // 4. กรองและแทนที่วิชาเสรี Slot ที่กรอกแล้ว
+            let finalCourses = [];
+
+            courses.forEach(course => {
+                const isSlot = course.is_user_entry_slot;
+                
+                if (isSlot) {
+                    const userEntry = userData.user_electives[course.slot_id];
+                    if (userEntry) {
+                        // ถ้า Slot ถูกกรอกแล้ว: ใช้ข้อมูลที่กรอกมา
+                        finalCourses.push(userEntry); 
+                    } else {
+                        // ถ้ายังไม่กรอก: ใช้ข้อมูล Slot Master เดิม
+                        finalCourses.push(course);
+                    }
+                } else {
+                    // วิชาบังคับ/แกน
+                    finalCourses.push(course);
+                }
+            });
+            
+            // 🚀 5. รวม Free Electives ที่ลงทะเบียนในเทอมนี้ (Logic ที่เพิ่มเข้ามา)
+            // เราจะใช้ Free Electives ทั้งหมดที่ถูกเพิ่มเข้ามารวมในการคำนวณ Credit ของเทอมนี้ด้วย
+            userData.free_electives.forEach(fe => {
+                // 🚨 NOTE: หากต้องการให้ Free Electives ปรากฏในตารางหลักด้วย ต้องมีการกำหนดเทอมให้ Free Elective
+                // แต่เนื่องจากคุณต้องการให้มันอยู่แค่ข้างล่าง เราจะรวมเฉพาะเพื่อคำนวณเท่านั้น
+                finalCourses.push({
+                    code: fe.code,
+                    name: fe.name,
+                    credit: fe.credit,
+                    grade: fe.grade,
+                    is_user_entry_slot: false, // Flag สำหรับ Free Elective ที่เพิ่มเอง
+                    code_type: 'FE'
+                });
+            });
+
+
+            let htmlContent = '';
+            
+            // 6. แสดงผลในตารางหลัก (เฉพาะวิชาจาก Master Plan)
+            finalCourses.filter(c => c.code_type !== 'FE').forEach(course => {
+                const isSlot = course.is_user_entry_slot;
+                
+                let code = course.code;
+                let name = course.name;
+                let credit = course.credit;
+                
+                let grade = '—';
+                if (isSlot) {
+                    grade = userData.user_electives[course.slot_id] ? userData.user_electives[course.slot_id].grade : '—';
+                } else {
+                    grade = userData.grades[course.code] ? userData.grades[course.code].grade : '—';
+                }
+                
+                htmlContent += `
+                    <tr data-code="${code}" data-is-slot="${isSlot}">
+                        <td>Year ${selectedYear}</td>
+                        <td>${selectedSemester}</td>
+                        <td>${code}</td>
+                        <td>${name}</td>
+                        <td>${credit}</td>
+                        <td>${createGradeDropdown(isSlot ? course.slot_id : code, grade)}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = htmlContent;
+            renderElectiveEntryTable();
+            updateStats(finalCourses); // ใช้ finalCourses รวมวิชาเสรีทั้งหมดมาคำนวณ
+        }
+        
+        function removeFreeElective(courseCode) {
+            const index = userData.free_electives.findIndex(c => c.code === courseCode);
+            if (index !== -1) {
+                userData.free_electives.splice(index, 1);
+                renderElectiveEntryTable();
+                renderGradeEntryTable();
+            }
+        }
+        
+        function saveElectiveEntry(inputElement, slotId) {
+            const row = inputElement.closest('tr');
+            const code = row.querySelector('[data-field="code"]').value;
+            const name = row.querySelector('[data-field="name"]').value;
+            const credit = parseInt(row.querySelector('[data-field="credit"]').value) || 3;
+            const grade = row.querySelector('.grade').value;
+
+            let status = (grade === 'F' || grade === 'W') ? grade : 'Passed';
+
+            userData.user_electives[slotId] = { code, name, credit, grade, status, slot_id: slotId, is_user_entry_slot: true };
+            renderGradeEntryTable();
+        }
+
+        function saveFreeElective(inputElement, oldCode) {
+            const row = inputElement.closest('tr');
+            const newCode = row.querySelector('[data-field="code"]').value;
+            const name = row.querySelector('[data-field="name"]').value;
+            const credit = parseInt(row.querySelector('[data-field="credit"]').value) || 3;
+            const grade = row.querySelector('.grade').value;
+            let status = (grade === 'F' || grade === 'W') ? grade : 'Passed';
+
+            const index = userData.free_electives.findIndex(c => c.code === oldCode);
+            if (index !== -1) {
+                userData.free_electives[index] = { code: newCode, name, credit, grade, status };
+            }
+            renderElectiveEntryTable();
+            renderGradeEntryTable();
+        }
+        
+        function renderElectiveEntryTable() {
+             const tbody = document.getElementById('elective-entry-body');
+             let htmlContent = '';
+             const selectedYear = document.getElementById('sel-year').value;
+             const selectedSemester = document.getElementById('sel-semester').value;
+             const currentTrackMaster = MASTER_CURRICULUM[userData.info.track_id];
+             const studyPlan = userData.info.study_plan;
+             
+             // 1. ดึง Slot ที่เกี่ยวข้องกับเทอมปัจจุบันเท่านั้น
+             const semesterKey = getSemesterKey(`Year ${selectedYear}`, selectedSemester, studyPlan);
+             const currentTermCourses = currentTrackMaster[`Year ${selectedYear}`] ? currentTrackMaster[`Year ${selectedYear}`][semesterKey] || [] : [];
+             
+             currentTermCourses.filter(c => c.is_user_entry_slot).forEach(slot => {
+                 const userEntry = userData.user_electives[slot.slot_id];
+                 const courseCode = userEntry ? userEntry.code : slot.code; 
+                 const courseName = userEntry ? userEntry.name : slot.name;
+                 const credit = userEntry ? userEntry.credit : slot.credit;
+                 const grade = userEntry ? userEntry.grade : '—';
+                 htmlContent += `
+                     <tr data-slot-id="${slot.slot_id}" data-type="slot">
+                         <td>${slot.slot_id} (${slot.type.replace('_Elective', '')})</td>
+                         <td><input type="text" class="inputelec" value="${courseCode}" data-field="code" onchange="saveElectiveEntry(this, '${slot.slot_id}')"></td>
+                         <td><input type="text" class="inputelec" value="${courseName}" data-field="name" onchange="saveElectiveEntry(this, '${slot.slot_id}')"></td>
+                         <td><input type="number" class="inputelec" value="${credit}" data-field="credit" onchange="saveElectiveEntry(this, '${slot.slot_id}')"></td>
+                         <td>${createGradeDropdown(slot.slot_id, grade)}</td>
+                         <td><button onclick="removeElectiveSlot('${slot.slot_id}')" disabled style="border: none;">🗑️ Delete</button></td>
+                     </tr>
+                 `;
+             });
+             
+             // 2. Free Electives (แสดงทั้งหมด - ไม่ได้ผูกกับเทอม)
+             userData.free_electives.forEach(course => {
+                 htmlContent += `
+                     <tr data-code="${course.code}" data-type="free">
+                         <td>Free Elective</td>
+                         <td><input type="text" class="inputelec" value="${course.code}" data-field="code" onchange="saveFreeElective(this, '${course.code}')"></td>
+                         <td><input type="text" class="inputelec" value="${course.name}" data-field="name" onchange="saveFreeElective(this, '${course.code}')"></td>
+                         <td><input type="number" class="inputelec" value="${course.credit}" data-field="credit" onchange="saveFreeElective(this, '${course.code}')"></td>
+                         <td>${createGradeDropdown(course.code, course.grade)}</td>
+                         <td><button style="border: none;" onclick="removeFreeElective('${course.code}')">🗑️ Delete</button></td>
+                     </tr>
+                 `;
+             });
+             tbody.innerHTML = htmlContent;
+         }
+
+        document.getElementById('add-free-elective-btn').addEventListener('click', () => {
+             const newCode = `FE${Math.floor(Math.random() * 1000)}`;
+             userData.free_electives.push({
+                 code: newCode,
+                 name: 'New Free Elective',
+                 credit: 3,
+                 grade: '—',
+                 status: '—'
+             });
+             renderElectiveEntryTable();
+             renderGradeEntryTable();
+        });
+        
+        function initializeSelectors() {
+            const currentTrackId = userData.info.track_id;
+
+            const yearSelect = document.getElementById('sel-year');
+            yearSelect.innerHTML = [...Array(4)].map((_, i) => `<option value="${i + 1}">Year ${i + 1}</option>`).join('');
+            yearSelect.value = userData.info.current_year;
+
+            const semSelect = document.getElementById('sel-semester');
+            semSelect.innerHTML = `<option value="1">1</option><option value="2">2</option><option value="summer">Summer</option>`;
+            if (['1', '2', 'summer'].includes(userData.info.current_semester)) {
+                semSelect.value = userData.info.current_semester;
+            } else {
+                semSelect.value = '1';
+            }
+
+            const trackSelect = document.getElementById('sel-track');
+            trackSelect.innerHTML = Object.keys(TRACKS_INFO).map(id => {
+                const selected = (id === currentTrackId) ? 'selected' : '';
+                return `<option value="${id}" ${selected}>${TRACKS_INFO[id].full_name}</option>`;
+            }).join('');
+            trackSelect.value = currentTrackId;
+            
+            document.querySelectorAll('#sel-year, #sel-semester').forEach(el => {
+                el.addEventListener('change', renderGradeEntryTable);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('student-badge').textContent =
+                `${userData.info.name} • ${userData.info.id}`;
+            document.getElementById('student-track').textContent =
+                `Track: ${TRACKS_INFO[userData.info.track_id].full_name}`;
+
+            initializeSelectors();
+            renderGradeEntryTable();
+        });
+    </script>
 </body>
 </html>
