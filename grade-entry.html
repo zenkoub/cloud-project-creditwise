@@ -1,109 +1,101 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="th">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Grade Entry | Credit Wise</title>
-    <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Grade Entry | Credit Wise</title>
+<link href="style.css" rel="stylesheet"/>
 </head>
-
 <body class="bg">
-    <div class="layout">
-        <aside class="sidebar">
-            <div class="side-title">
-                <div class="hat"></div>
-                <div>Credit&nbsp;Wise</div>
-            </div>
-            <a class="side-btn" href="dashboard.html">Dashboard</a>
-            <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
-            <a class="side-btn active" href="grade-entry.html">Grade Entry</a>
-            <a class="side-btn" href="planner.html">Planner</a>
-            <a class="side-btn-bottom" href="index.html">Sign out</a>
-        </aside>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+<div class="side-title">
+<div class="hat"></div>
+<div>Credit Wise</div>
+</div>
+<a class="side-btn" href="dashboard.html">Dashboard</a>
+<a class="side-btn" href="curriculum.html">Curriculum Plan</a>
+<a class="side-btn active" href="grade-entry.html">Grade Entry</a>
+<a class="side-btn" href="planner.html">Planner</a>
 
-        <main>
-            <div class="page-head" style="margin-top: 5%;">
-                <i></i>
-                <div class="badge" id="student-badge"></div>
-            </div>
-            <div class="page-head">
-                <h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Grade Entry</h2>
-                <div id="student-track" style="color: #040431;"></div>
-            </div>
-
-            <div class="card">
-                <div class="toolbar">
-                    <label>
-                        <h4>Year <select class="sel" id="sel-year"></select></h4>
-                    </label>
-                    <label>
-                        <h4>Semester
+<a class="side-btn-bottom" href="index.html">Sign out</a></aside>
+<main><div class="mobile-topbar"><button aria-label="Toggle menu" class="hamburger" id="menuBtn">☰</button></div>
+<div class="page-head" style="margin-top: 5%;">
+<i></i>
+<div class="badge" id="student-badge"></div>
+</div>
+<div class="page-head">
+<h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Grade Entry</h2>
+<div id="student-track" style="color: #040431;"></div>
+</div>
+<div class="card">
+<div class="toolbar">
+<label>
+<h4>Year <select class="sel" id="sel-year"></select></h4>
+</label>
+<label>
+<h4>Semester
                             <select class="sel" id="sel-semester"></select>
-                        </h4>
-                    </label>
-                    <label>
-                        <h4>Module
-                            <select class="sel" id="sel-track" disabled></select>
-                        </h4>
-                    </label>
-                </div>
-
-                <table id="main-course-table">
-                    <thead>
-                        <tr>
-                            <th style="width:10%">Year</th>
-                            <th style="width:10%">Semester</th>
-                            <th style="width:15%">Course Code</th>
-                            <th style="width:40%">Course Name</th>
-                            <th style="width:10%">Credit</th>
-                            <th style="width:15%">Grade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="grade-entry-body">
-                    </tbody>
-                </table>
-
-                <div class="tbl-head" style="margin-top: 20px;">Elective Course Entry (วิชาเสรีที่เลือกเอง)</div>
-                <div class="sub-head" style="margin-bottom: 10px;">
+</h4>
+</label>
+<label>
+<h4>Module
+                            <select class="sel" disabled="" id="sel-track"></select>
+</h4>
+</label>
+</div>
+<table id="main-course-table">
+<thead>
+<tr>
+<th style="width:10%">Year</th>
+<th style="width:10%">Semester</th>
+<th style="width:15%">Course Code</th>
+<th style="width:40%">Course Name</th>
+<th style="width:10%">Credit</th>
+<th style="width:15%">Grade</th>
+</tr>
+</thead>
+<tbody id="grade-entry-body">
+</tbody>
+</table>
+<div class="tbl-head" style="margin-top: 20px;">Elective Course Entry (วิชาเสรีที่เลือกเอง)</div>
+<div class="sub-head" style="margin-bottom: 10px;">
                     กรอกวิชาเสรีที่ถูกลงทะเบียนเพื่อเติม Slot ว่าง (ด้านบน) หรือเพิ่มเป็น Free Electives (ด้านล่าง)
                 </div>
-                <table id="elective-entry-table">
-                    <thead>
-                        <tr>
-                            <th style="width:15%">Type/Slot</th>
-                            <th style="width:15%">Code</th>
-                            <th style="width:30%">Name</th>
-                            <th style="width:10%">Credit</th>
-                            <th style="width:15%">Grade</th>
-                            <th style="width:10%">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="elective-entry-body">
-                    </tbody>
-                </table>
-                <button id="add-free-elective-btn" class="addbtn" style="margin-top: 10px; padding: 8px 15px;">+ Add Free
+<table id="elective-entry-table">
+<thead>
+<tr>
+<th style="width:15%">Type/Slot</th>
+<th style="width:15%">Code</th>
+<th style="width:30%">Name</th>
+<th style="width:10%">Credit</th>
+<th style="width:15%">Grade</th>
+<th style="width:10%">Action</th>
+</tr>
+</thead>
+<tbody id="elective-entry-body">
+</tbody>
+</table>
+<button class="addbtn" id="add-free-elective-btn" style="margin-top: 10px; padding: 8px 15px;">+ Add Free
                     Elective</button>
-
-
-                <div class="ft">
-                    <div class="stat">
-                        <div style="color:#6a7fb7;font-weight:800">TOTAL CREDIT (TERM)</div><b id="term-total-credit">0</b>
-                    </div>
-                    <div class="stat">
-                        <div style="color:#6a7fb7;font-weight:800">CREDIT EARNED (TERM)</div><b id="term-earned-credit">0</b>
-                    </div>
-                    <div class="stat">
-                        <div style="color:#6a7fb7;font-weight:800">GPA</div><b id="term-gpa">0.00</b>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script src="curriculum-master.js"></script>
-    <script src="user.js"></script>
-    <script>
+<div class="ft">
+<div class="stat">
+<div style="color:#6a7fb7;font-weight:800">TOTAL CREDIT (TERM)</div><b id="term-total-credit">0</b>
+</div>
+<div class="stat">
+<div style="color:#6a7fb7;font-weight:800">CREDIT EARNED (TERM)</div><b id="term-earned-credit">0</b>
+</div>
+<div class="stat">
+<div style="color:#6a7fb7;font-weight:800">GPA</div><b id="term-gpa">0.00</b>
+</div>
+</div>
+</div>
+</main>
+</div>
+<script src="curriculum-master.js"></script>
+<script src="user.js"></script>
+<script>
         const userData = getCurrentUserData();
         const GRADE_OPTIONS = ['—', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F', 'W', 'S', 'U'];
 
@@ -480,5 +472,5 @@
             renderGradeEntryTable();
         });
     </script>
-</body>
+<script src="menu-toggle.js"></script></body>
 </html>

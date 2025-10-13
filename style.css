@@ -9,7 +9,7 @@
 .bg{
   background:
    linear-gradient(rgba(21,87,213,.08),rgba(21,87,213,.08)),
-   url('/cloud-project-creditwise/bg.png ') center/cover no-repeat fixed;
+   url('/bg.png') center/cover no-repeat fixed;
   display:grid; place-items:center; color:var(--text);
 }
 
@@ -274,3 +274,86 @@ dialog{border:none;border-radius:18px;padding:0;max-width:760px;width:92vw}
   text-align: center;
   width: 200px;
 }
+
+
+/* ====== FIXED SIDEBAR LAYOUT OVERRIDES (added by ChatGPT) ====== */
+:root{
+  --sidebar-w: 260px;
+  --sidebar-offset: 60px;   /* distance from left on desktop */
+  --sidebar-top: 120px;     /* distance from top on desktop */
+}
+
+.layout{ display:block; width:100%; gap:0; }
+
+.sidebar{
+  position: fixed;
+  left: var(--sidebar-offset);
+  top: var(--sidebar-top);
+  bottom: 40px;
+  width: var(--sidebar-w);
+  height: auto;
+  overflow: visible;
+  z-index: 1000;
+}
+
+main{
+  margin-left: calc(var(--sidebar-offset) + var(--sidebar-w) + 20px);
+  min-height: 100dvh;
+}
+
+/* Mobile / Tablet: make the sidebar off-canvas */
+@media (max-width: 1024px){
+  .sidebar{
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+  }
+  .sidebar.is-open{ transform: translateX(0); }
+  main{ margin-left: 0; padding: 16px; }
+  body.menu-open{ overflow: hidden; }
+}
+
+/* Hamburger button (show on small screens only) */
+.hamburger{
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.15);
+  cursor: pointer;
+}
+@media (max-width:1024px){ .hamburger{ display:inline-flex } }
+/* ====== END OVERRIDES ====== */
+
+
+/* ===== Tweaks after user review ===== */
+
+/* 1) Give content some breathing room on the right */
+main{ padding-right: 40px; padding-left: 4px; }
+
+/* 2) Sidebar: keep Sign out pinned at the bottom even when collapsed */
+.sidebar{ display:flex; flex-direction:column; }
+.side-btn-bottom, .side-btn-bottom-ad{ margin-top:auto; }
+
+/* 3) Center login page and keep brand above card */
+.bg{ display:grid; place-items:center; }
+.brand{ position: static; transform:none; display:flex; justify-content:center; margin-bottom: 8px; }
+.logo{ max-width: 160px; height:auto; }
+
+/* 5) Admin pages spacing */
+.topbar{ padding-right: 8px; }
+
+/* Keep planner page width comfortable without touching edges */
+.planner-container{ width: min(1100px, 92vw); margin-right: auto; }
+
+
+/* v2.2: center planner vertically with top spacing */
+.planner-container, .planner-area, .planner-wrap{
+  width: min(1100px, 94vw);
+  margin: 60px auto 0 auto;
+}
+

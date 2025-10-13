@@ -1,11 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin • Student Management | Credit Wise</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Admin • Student Management | Credit Wise</title>
+<link href="style.css" rel="stylesheet"/>
+<style>
     .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
   </style>
 </head>
@@ -19,42 +20,39 @@
 })();
 </script>
 <body class="bg">
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="side-title"><div class="hat"></div><div>Credit&nbsp;Wise</div></div>
-      <a class="side-btn" href="admin-dashboard.html">Dashboard</a>
-      <a class="side-btn active" href="admin-students.html">Student Management</a>
-      <a class="side-btn" href="admin-curriculum.html">Curriculum Management</a>
-      <a class="side-btn-bottom-ad" href="index.html">Sign out</a>
-    </aside>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+<div class="side-title"><div class="hat"></div><div>Credit Wise</div></div>
+<a class="side-btn" href="admin-dashboard.html">Dashboard</a>
+<a class="side-btn active" href="admin-students.html">Student Management</a>
+<a class="side-btn" href="admin-curriculum.html">Curriculum Management</a>
 
-    <main>
-      <div class="topbar">
-        <h2 style="margin:0;color:#fff">Student Management</h2>
-        <div class="badge">Admin Panel</div>
-      </div>
-
-      <div class="card">
-        <table id="stuTable">
-          <thead>
-            <tr>
-              <th style="width:6%">No.</th>
-              <th style="width:18%">Name</th>
-              <th style="width:18%">SureName</th>
-              <th style="width:28%">Email</th>
-              <th style="width:10%">Credit</th>
-              <th style="width:10%">Grade</th>
-              <th style="width:10%">Status</th>
-            </tr>
-          </thead>
-          <tbody><!-- เติมด้วย JS --></tbody>
-        </table>
-      </div>
-    </main>
-  </div>
-
-  <script src="admin.js"></script>
-  <script>
+<a class="side-btn-bottom-ad" href="index.html">Sign out</a></aside>
+<main><div class="mobile-topbar"><button aria-label="Toggle menu" class="hamburger" id="menuBtn">☰</button></div>
+<div class="topbar">
+<h2 style="margin:0;color:#fff">Student Management</h2>
+<div class="badge">Admin Panel</div>
+</div>
+<div class="card">
+<table id="stuTable">
+<thead>
+<tr>
+<th style="width:6%">No.</th>
+<th style="width:18%">Name</th>
+<th style="width:18%">SureName</th>
+<th style="width:28%">Email</th>
+<th style="width:10%">Credit</th>
+<th style="width:10%">Grade</th>
+<th style="width:10%">Status</th>
+</tr>
+</thead>
+<tbody><!-- เติมด้วย JS --></tbody>
+</table>
+</div>
+</main>
+</div>
+<script src="admin.js"></script>
+<script>
     // แสดงรายการนักศึกษาจาก localStorage (ตัวอย่าง)
     const tbody = document.querySelector('#stuTable tbody');
     const students = window.cwAdmin.getStudents(); // [{...}]
@@ -70,5 +68,5 @@
       </tr>
     `).join('');
   </script>
-</body>
+<script src="menu-toggle.js"></script></body>
 </html>

@@ -1,41 +1,38 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="th">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Curriculum Plan | Credit Wise</title>
-    <link rel="stylesheet" href="style.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Curriculum Plan | Credit Wise</title>
+<link href="style.css" rel="stylesheet"/>
 </head>
 <body class="bg">
-    <div class="layout">
-        <aside class="sidebar">
-            <div class="side-title"><div class="hat"></div><div>Credit&nbsp;Wise</div></div>
-            <a class="side-btn" href="dashboard.html">Dashboard</a>
-            <a class="side-btn active" href="curriculum.html">Curriculum Plan</a>
-            <a class="side-btn" href="grade-entry.html">Grade Entry</a>
-            <a class="side-btn" href="planner.html">Planner</a>
-            <a class="side-btn-bottom" href="index.html">Sign out</a>
-        </aside>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+<div class="side-title"><div class="hat"></div><div>Credit Wise</div></div>
+<a class="side-btn" href="dashboard.html">Dashboard</a>
+<a class="side-btn active" href="curriculum.html">Curriculum Plan</a>
+<a class="side-btn" href="grade-entry.html">Grade Entry</a>
+<a class="side-btn" href="planner.html">Planner</a>
 
-        <main>
-            <div class="page-head" style="margin-top: 5%;">
-                <i></i>
-                <div class="badge" id="student-badge"></div>
-            </div>
-            <div class="page-head">
-                <h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Curriculum Plan</h2>
-                <div id="student-track" style="color: #040431;"></div>
-            </div>
-            
-            <div class="card" id="curriculum-container">
-                </div>
-
-        </main>
-    </div>
-
-    <script src="curriculum-master.js"></script> 
-    <script src="user.js"></script>
-    <script>
+<a class="side-btn-bottom" href="index.html">Sign out</a></aside>
+<main><div class="mobile-topbar"><button aria-label="Toggle menu" class="hamburger" id="menuBtn">☰</button></div>
+<div class="page-head" style="margin-top: 5%;">
+<i></i>
+<div class="badge" id="student-badge"></div>
+</div>
+<div class="page-head">
+<h2 style="margin:0;color:#fff; text-shadow: 2px 2px 3px #182747;">Curriculum Plan</h2>
+<div id="student-track" style="color: #040431;"></div>
+</div>
+<div class="card" id="curriculum-container">
+</div>
+</main>
+</div>
+<script src="curriculum-master.js"></script>
+<script src="user.js"></script>
+<script>
         function renderCurriculum() {
             const userData = getCurrentUserData();
             const trackId = userData.info.track_id;
@@ -157,5 +154,5 @@
 
         document.addEventListener('DOMContentLoaded', renderCurriculum);
     </script>
-</body>
+<script src="menu-toggle.js"></script></body>
 </html>

@@ -1,11 +1,12 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin • Curriculum Management | Credit Wise</title>
-  <link rel="stylesheet" href="style.css" />
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Admin • Curriculum Management | Credit Wise</title>
+<link href="style.css" rel="stylesheet"/>
+<style>
     .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
     .toolbar{display:flex;gap:10px}
     .btn-sm{border:none;border-radius:999px;padding:8px 14px;font-weight:800;cursor:pointer}
@@ -32,71 +33,67 @@
 })();
 </script>
 <body class="bg">
-  <div class="layout">
-    <aside class="sidebar">
-      <div class="side-title"><div class="hat"></div><div>Credit&nbsp;Wise</div></div>
-      <a class="side-btn" href="admin-dashboard.html">Dashboard</a>
-      <a class="side-btn" href="admin-students.html">Student Management</a>
-      <a class="side-btn active" href="admin-curriculum.html">Curriculum Management</a>
-      <a class="side-btn" href="index.html">Sign out</a>
-    </aside>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+<div class="side-title"><div class="hat"></div><div>Credit Wise</div></div>
+<a class="side-btn" href="admin-dashboard.html">Dashboard</a>
+<a class="side-btn" href="admin-students.html">Student Management</a>
+<a class="side-btn active" href="admin-curriculum.html">Curriculum Management</a>
 
-    <main>
-      <div class="topbar">
-        <h2 style="margin:0;color:#fff">Curriculum Management</h2>
-        <div class="toolbar">
-          <button class="btn-sm btn-add" id="btnAdd">ADD</button>
-          <button class="btn-sm btn-edit" id="btnEdit">EDIT</button>
-          <button class="btn-sm btn-del" id="btnDelete">DELETE</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="tbl-head">Year 1 • Semester 1</div>
-        <table id="courseTable">
-          <thead>
-            <tr>
-              <th style="width:6%"></th>
-              <th style="width:8%">Year</th>
-              <th style="width:8%">Semester</th>
-              <th style="width:12%">Course Code</th>
-              <th>Course Name</th>
-              <th style="width:8%">Credit</th>
-              <th style="width:10%">Capacity</th>
-              <th style="width:10%">Enroll</th>
-            </tr>
-          </thead>
-          <tbody><!-- เติมด้วย JS --></tbody>
-        </table>
-      </div>
-    </main>
-  </div>
-
-  <!-- Modal Add/Edit -->
-  <dialog id="dlg">
-    <div class="modal">
-      <div class="modal-h" id="dlgTitle">Add Course</div>
-      <form class="modal-b" id="courseForm">
-        <input type="hidden" name="id" />
-        <div class="grid">
-          <input class="ip" name="year" type="number" min="1" max="8" placeholder="Year" required />
-          <input class="ip" name="semester" type="number" min="1" max="3" placeholder="Sem" required />
-          <input class="ip" name="code" placeholder="Course Code" required />
-          <input class="ip" name="name" placeholder="Course Name" required />
-          <input class="ip" name="credit" type="number" min="0" step="1" placeholder="Credit" required />
-          <input class="ip" name="capacity" type="number" min="0" step="1" placeholder="Capacity" />
-          <input class="ip" name="enroll" type="number" min="0" step="1" placeholder="Enroll" />
-        </div>
-        <div class="right">
-          <button type="submit" class="btn-sm btn-add">Save</button>
-          <button type="button" class="btn-sm btn-del" id="closeDlg">Cancel</button>
-        </div>
-      </form>
-    </div>
-  </dialog>
-
-  <script src="admin.js"></script>
-  <script>
+<a class="side-btn side-btn-bottom-ad" href="index.html">Sign out</a></aside>
+<main><div class="mobile-topbar"><button aria-label="Toggle menu" class="hamburger" id="menuBtn">☰</button></div>
+<div class="topbar">
+<h2 style="margin:0;color:#fff">Curriculum Management</h2>
+<div class="toolbar">
+<button class="btn-sm btn-add" id="btnAdd">ADD</button>
+<button class="btn-sm btn-edit" id="btnEdit">EDIT</button>
+<button class="btn-sm btn-del" id="btnDelete">DELETE</button>
+</div>
+</div>
+<div class="card">
+<div class="tbl-head">Year 1 • Semester 1</div>
+<table id="courseTable">
+<thead>
+<tr>
+<th style="width:6%"></th>
+<th style="width:8%">Year</th>
+<th style="width:8%">Semester</th>
+<th style="width:12%">Course Code</th>
+<th>Course Name</th>
+<th style="width:8%">Credit</th>
+<th style="width:10%">Capacity</th>
+<th style="width:10%">Enroll</th>
+</tr>
+</thead>
+<tbody><!-- เติมด้วย JS --></tbody>
+</table>
+</div>
+</main>
+</div>
+<!-- Modal Add/Edit -->
+<dialog id="dlg">
+<div class="modal">
+<div class="modal-h" id="dlgTitle">Add Course</div>
+<form class="modal-b" id="courseForm">
+<input name="id" type="hidden"/>
+<div class="grid">
+<input class="ip" max="8" min="1" name="year" placeholder="Year" required="" type="number"/>
+<input class="ip" max="3" min="1" name="semester" placeholder="Sem" required="" type="number"/>
+<input class="ip" name="code" placeholder="Course Code" required=""/>
+<input class="ip" name="name" placeholder="Course Name" required=""/>
+<input class="ip" min="0" name="credit" placeholder="Credit" required="" step="1" type="number"/>
+<input class="ip" min="0" name="capacity" placeholder="Capacity" step="1" type="number"/>
+<input class="ip" min="0" name="enroll" placeholder="Enroll" step="1" type="number"/>
+</div>
+<div class="right">
+<button class="btn-sm btn-add" type="submit">Save</button>
+<button class="btn-sm btn-del" id="closeDlg" type="button">Cancel</button>
+</div>
+</form>
+</div>
+</dialog>
+<script src="admin.js"></script>
+<script>
     const tableBody = document.querySelector('#courseTable tbody');
     const dlg = document.getElementById('dlg');
     const form = document.getElementById('courseForm');
@@ -172,6 +169,6 @@
     };
     document.getElementById('closeDlg').onclick = ()=> dlg.close();
   </script>
-</body>
+<script src="menu-toggle.js"></script></body>
 </html>
 . 
