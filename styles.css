@@ -9,7 +9,7 @@
 .bg{
   background:
    linear-gradient(rgba(21,87,213,.08),rgba(21,87,213,.08)),
-   url('/bg.png') center/cover no-repeat fixed;
+   url('/img/bg.png') center/cover no-repeat fixed;
   display:grid; place-items:center; color:var(--text);
 }
 
