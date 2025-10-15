@@ -1,5 +1,5 @@
 :root{
-  --card:#a1b5da; --card2:#134cb8; --muted:#b7ccff; --white:#fff;
+  --card:#f0f6ff; --card2:#134cb8; --muted:#b7ccff; --white:#fff;
   --shadow:0 20px 50px rgba(17,52,140,.25); --r:22px;
   --text:#ffffff;
 }
@@ -23,8 +23,8 @@
 }
 
 .title{text-align:center;font-weight:800;font-size:26px;margin:18px 0 8px}
-label{display:block;font-size:14px;margin:12px 0 8px 6px; color: #1b2b57;}
-.input{width:100%;height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.12);color:#eef3ff;padding:0 16px}
+label{display:block;font-size:14px;margin:12px 0 8px 6px; color: #000000;}
+.input{width:100%;height:48px;border:none;border-radius:14px;background:rgba(255, 255, 255, 0.815);color:#000000;padding:0 16px}
 .row{position:relative}
 .toggle{position:absolute;right:12px;top:20%;transform:translateY(6px);background:transparent;border:none;color:#dfe7ff;cursor:pointer}
 .actions{display:flex;justify-content:center;margin-top:18px}
@@ -398,9 +398,9 @@ body.bg.login-page .brand{
   position:static !important;
   transform:none !important;
   margin:0 auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:block;
+  text-align: center;
+  margin-bottom: 12px;
 }
 
 @media (max-width:480px){
@@ -563,14 +563,20 @@ body.bg.login-page main.login-wrap{
   flex: none;
 }
 
-
 /* ===============================
    ADMIN PAGES ONLY (safe scope)
    =============================== */
 
 /* ปรับตัวเลขได้ตามชอบ */
 .admin-page{
-  --admin-content-max: 1000px;                 /* กว้างสูงสุดของคอนเทนต์ */
+  --admin-conten  /* ===============================
+     ADMIN PAGES ONLY (safe scope)
+     =============================== */
+  
+  /* ... other rules ... */
+  
+  /* Sidebar ขยับขึ้นเล็กน้อยให้บาลานซ์ */
+  .admin-page .sidebar{ top: 8em !important; } t-max: 1000px;                 /* กว้างสูงสุดของคอนเทนต์ */
   --admin-left-gap: calc(var(--sidebar-offset) + var(--sidebar-w) + 60px);
 }
 
@@ -593,9 +599,6 @@ body.bg.login-page main.login-wrap{
 
 /* ระยะหัวหน้าเพจ */
 .admin-page .page-head{ margin-top: 20px; }
-
-/* Sidebar ขยับขึ้นเล็กน้อยให้บาลานซ์ */
-.admin-page .sidebar{ top: 8em !important; }
 
 /* Responsive: จอ ≤ 1024px ให้ซ่อน sidebar (ตามระบบเดิม) และยืด main เต็ม */
 @media (max-width:1024px){
@@ -620,11 +623,12 @@ body.bg.login-page main.login-wrap{
 .side-title{
   display:flex;
   align-items:center;
-  justify-content:space-between;
+  justify-content:flex-start;
 }
 .mobile-topbar{ display:none; position:fixed; left:12px; top:12px; z-index:1200; }
 .side-close{ display:none; }
 @media (max-width:1024px){
+  .side-title { justify-content: space-between; }
   .mobile-topbar{ display:block; }
   .side-close{ display:inline-flex; }
 }
