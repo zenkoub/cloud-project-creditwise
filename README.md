@@ -2,7 +2,7 @@
 ระบบติดตามหน่วยกิตและวางแผนการศึกษาตามหลักสูตร 
 CreditWise 
 
-how to host in local
+# how to host in local
 ```bash
 node server.js
 ```
