@@ -576,7 +576,7 @@ body.bg.login-page main.login-wrap{
   /* ... other rules ... */
   
   /* Sidebar ขยับขึ้นเล็กน้อยให้บาลานซ์ */
-  .admin-page .sidebar{ top: 8em !important; } t-max: 1000px;                 /* กว้างสูงสุดของคอนเทนต์ */
+  .admin-page .sidebar{ top: 8em !important; }
   --admin-left-gap: calc(var(--sidebar-offset) + var(--sidebar-w) + 60px);
 }
 
