@@ -15,7 +15,13 @@
 
 /* login card */
 .login-wrap{ width:min(520px,92vw); background:linear-gradient(180deg,var(--card),var(--card2)); border-radius:var(--r); box-shadow:var(--shadow); padding:28px }
-.brand{position:absolute;  transform:translate(50%, -310%); display:flex; gap:10px; align-items:center}
+/* ใช้ absolute เฉพาะหน้าที่ไม่ใช่ login */
+.bg:not(.login-page) .brand{
+  position:absolute;
+  transform:translate(50%, -310%);
+  display:flex; gap:10px; align-items:center;
+}
+
 .title{text-align:center;font-weight:800;font-size:26px;margin:18px 0 8px}
 label{display:block;font-size:14px;margin:12px 0 8px 6px; color: #1b2b57;}
 .input{width:100%;height:48px;border:none;border-radius:14px;background:rgba(255,255,255,.12);color:#eef3ff;padding:0 16px}
@@ -341,7 +347,16 @@ main{ padding-right: 40px; padding-left: 4px; }
 
 /* 3) Center login page and keep brand above card */
 .bg{ display:grid; place-items:center; }
-.brand{ position: static; transform:none; display:flex; justify-content:center; margin-bottom: 8px; }
+/* โลโก้แบบ absolute เฉพาะหน้าที่ไม่ใช่ login */
+.bg:not(.login-page) .brand {
+  position: absolute;
+  transform: translate(50%, -310%);
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+
 .logo{ max-width: 160px; height:auto; }
 
 /* 5) Admin pages spacing */
@@ -357,3 +372,247 @@ main{ padding-right: 40px; padding-left: 4px; }
   margin: 60px auto 0 auto;
 }
 
+/* Ensure sign-out stays at the bottom of the sidebar on all pages */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+}
+.side-btn-bottom,
+.side-btn-bottom-ad {
+  margin-top: auto;
+}
+
+/* ===== LOGIN PAGE ONLY (scoped) ===== */
+body.bg.login-page{
+  min-height:100svh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+  padding-block:40px;
+  padding-inline:16px;
+}
+
+body.bg.login-page .brand{
+  position:static !important;
+  transform:none !important;
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+@media (max-width:480px){
+  body.bg.login-page .login-wrap{
+    max-width:92vw;
+    padding:16px 20px;
+  }
+}
+
+/* ===== Fix: login page should ignore global <main> margin ===== */
+body.bg.login-page main.login-wrap{
+  margin-left: 0 !important;  /* ล้าง margin-left 150px ของหน้าอื่น */
+  flex: none;                  /* กันการยืดโดยไม่ตั้งใจ */
+}
+
+/* เว้นระยะโลโก้เหนือการ์ดเล็กน้อย */
+body.bg.login-page .brand{
+  margin-top: 6px;
+}
+
+/* ===== Login fine-tuning (final touch) ===== */
+
+/* ขยับโลโก้ให้ห่างจากกล่องมากขึ้น */
+body.bg.login-page .brand {
+  margin-bottom: 18px; /* เพิ่มระยะห่างระหว่างโลโก้กับกล่อง */
+}
+
+/* ===== FINAL FIX: login centering & spacing ===== */
+
+/* 1. ปรับ layout หน้า login ให้โลโก้ไม่ถูกกิน */
+body.bg.login-page {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;   /* ให้เริ่มจากด้านบนแทนที่จะอยู่ตรงกลาง */
+  padding-top: 70px;             /* เพิ่มระยะจากขอบบน */
+  padding-bottom: 60px;
+  gap: 30px;                     /* ระยะห่างโลโก้กับกล่อง */
+  min-height: 100vh;
+}
+
+/* 2. โลโก้ตรงกลางแนวนอน และมีระยะห่างจากขอบ */
+body.bg.login-page .brand {
+  position: static !important;
+  transform: none !important;
+  margin: 0 auto 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 3. กล่อง login พอดี ไม่สูงเกิน */
+body.bg.login-page .login-wrap {
+  width: 100%;
+  max-width: 480px;            /* ย่อความกว้างเล็กน้อย */
+  padding: 8px 20px 10px;   /* ลด padding ให้เตี้ยลงกว่าปกติ */
+  border-radius: var(--r);
+  box-shadow: var(--shadow);
+  background: linear-gradient(180deg, var(--card), var(--card2));
+}
+
+/* 4. ลดขนาดโลโก้ให้สมดุล */
+body.bg.login-page .logo {
+  max-width: 120px;
+  height: auto;
+}
+
+/* ===== SHORTER LOGIN BOX (final size tweak) ===== */
+
+
+/* ย่อความสูงของช่อง input และปุ่ม login */
+body.bg.login-page .input {
+  height: 40px;             /* เดิม 48px */
+}
+
+body.bg.login-page .btn {
+  height: 38px;             /* เดิม 44px */
+  font-size: 14px;
+  padding: 0 20px;
+}
+
+/* ลด margin ด้านบน-ล่างของหัวข้อ login */
+body.bg.login-page .title {
+  margin: 10px 0 4px;       /* เดิม 18px 0 8px */
+}
+
+/* ลดระยะใต้ฟุตเตอร์ */
+body.bg.login-page .foot {
+  margin-top: 6px;
+}
+
+body.bg.login-page main.login-wrap{
+  margin-left: 0 !important;
+  flex: none;
+}
+
+/* ===== COMPACT LOGIN like reference ===== */
+
+/* 1) ตัดความสูงบังคับของการ์ด (ตัวการหลัก!) */
+body.bg.login-page main.login-wrap{
+  margin-left: 0 !important;   /* ล้าง margin จากหน้าอื่น */
+  min-height: auto !important; /* ← ล้าง 100dvh ที่ main กำหนดไว้ */
+  flex: none;
+}
+
+/* 2) ย่อขนาดการ์ดและระยะภายในให้เตี้ยลง */
+body.bg.login-page .login-wrap{
+  max-width: 380px;
+  padding: 10px 18px 12px;
+}
+
+/* 3) ย่อองค์ประกอบในฟอร์ม */
+body.bg.login-page .title{ font-size:24px; margin: 8px 0 6px; }
+body.bg.login-page label{ margin: 6px 0 4px 6px; }
+
+body.bg.login-page .input{
+  height: 38px;              /* เดิม 48px */
+  font-size: 14px;
+  border-radius: 12px;
+  padding: 0 12px;
+}
+
+body.bg.login-page .btn{
+  height: 36px;              /* เดิม 44px */
+  font-size: 14px;
+  padding: 0 18px;
+  border-radius: 18px;
+}
+
+body.bg.login-page .actions{ margin-top: 10px; }
+body.bg.login-page .foot{ margin-top: 6px; font-size: 12px; }
+
+/* 4) ระยะห่างโลโก้กับการ์ดพอดี */
+body.bg.login-page .brand{ margin-bottom: 12px; }
+
+
+/* === FORCE PERFECT CENTER ON LOGIN PAGE === */
+body.bg.login-page{
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;           /* กลางแนวนอน */
+  justify-content: center !important; /* กลางแนวตั้ง */
+  min-height: 100vh;             /* กินสูงเท่าจอ */
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 14px;                     /* ระยะห่างโลโก้กับกล่อง */
+}
+
+/* โลโก้ให้อิง flow ปกติ (ไม่ absolute) */
+body.bg.login-page .brand{
+  position: static !important;
+  transform: none !important;
+  margin: 0 auto 10px;           /* ห่างกล่องเล็กน้อย */
+}
+
+/* การ์ด login ไม่ดันสูงทั้งจอ และไม่เอียงขวา */
+body.bg.login-page main.login-wrap{
+  margin-left: 0 !important;
+  min-height: auto !important;   /* ล้าง 100dvh ของ main จากหน้าอื่น */
+  flex: none;
+}
+
+
+/* ===============================
+   ADMIN PAGES ONLY (safe scope)
+   =============================== */
+
+/* ปรับตัวเลขได้ตามชอบ */
+.admin-page{
+  --admin-content-max: 1000px;                 /* กว้างสูงสุดของคอนเทนต์ */
+  --admin-left-gap: calc(var(--sidebar-offset) + var(--sidebar-w) + 60px);
+}
+
+/* จัดตำแหน่ง main ให้อยู่กลางแบบรูปอ้างอิง (รูปที่ 4) */
+.admin-page main{
+  margin-left: var(--admin-left-gap) !important;
+  margin-right: auto;
+  width: min(var(--admin-content-max), 90vw);
+  margin-top: var(--sidebar-top);   /* ขยับ content ลงมาเท่ากับ sidebar */
+}
+
+/* ให้กล่อง/ตารางอยู่กึ่งกลางแนวนอน */
+.admin-page .panel,
+.admin-page .card,
+.admin-page .dash-grid,
+.admin-page table{
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ระยะหัวหน้าเพจ */
+.admin-page .page-head{ margin-top: 20px; }
+
+/* Sidebar ขยับขึ้นเล็กน้อยให้บาลานซ์ */
+.admin-page .sidebar{ top: 8em !important; }
+
+/* Responsive: จอ ≤ 1024px ให้ซ่อน sidebar (ตามระบบเดิม) และยืด main เต็ม */
+@media (max-width:1024px){
+  .admin-page main{
+    margin-left: 0 !important;
+    width: min(1100px, 94vw);
+    padding: 16px;
+  }
+  .admin-page .sidebar{
+    left: 0; top: 0; bottom: 0;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+  }
+  .admin-page .sidebar.is-open{ transform: translateX(0); }
+}
+
+/* ปรับให้หน้าดูบาลานซ์เล็กน้อย */
+.admin-page .page-head {
+  margin-top: 0 !important;        /* เอา margin เดิมออกกันซ้ำซ้อน */
+}
