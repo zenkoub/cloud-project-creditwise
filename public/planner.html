@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Planner | Credit Wise</title>
+  <link rel="stylesheet" href="/css/style.css"/>
+</head>
+
+<body class="bg user-page">
+  <div class="layout">
+    <!-- ===== Sidebar ===== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="side-title">
+        <div class="hat"></div>
+        <div>Credit Wise</div>
+        <!-- ปุ่ม ✕ ปิด sidebar -->
+        <button class="hamburger side-close" id="closeMenu" aria-label="Close menu">✕</button>
+      </div>
+
+      <a class="side-btn" href="dashboard.html">Dashboard</a>
+      <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
+      <a class="side-btn" href="grade-entry.html">Grade Entry</a>
+      <a class="side-btn active" href="planner.html">Planner</a>
+      <a class="side-btn" href="index.html">Sign Out</a>
+    </aside>
+
+    <!-- ===== Main ===== -->
+    <main>
+      <!-- ปุ่ม ☰ สำหรับเปิด sidebar -->
+      <div class="mobile-topbar">
+        <button class="hamburger" id="menuBtn" aria-label="Toggle menu">☰</button>
+      </div>
+
+      <div class="page-head">
+        <i></i>
+        <div class="badge" id="student-badge"></div>
+      </div>
+
+      <div class="page-head">
+        <h2 style="margin:0;color:#fff;text-shadow:2px 2px 3px #182747;">Grade Planner</h2>
+        <div id="student-track" style="color:#040431;"></div>
+      </div>
+
+      <!-- เนื้อหาเดิม -->
+      <div class="hdr">Course Code    Course Name    Credit    Score    Grade</div>
+
+      <div class="list-card">
+        <div class="rowx">
+          <div><b>06016401</b></div>
+          <div style="font-size:13px">MATHEMATICS FOR INFORMATION TECHNOLOGY</div>
+          <div>3</div><div>78</div><div><b>B+</b></div>
+          <div><button class="action" id="action">•••</button></div>
+        </div>
+      </div>
+
+      <div class="list-card">
+        <div class="rowx">
+          <div><b>06016411</b></div>
+          <div style="font-size:13px">INTRODUCTION TO COMPUTER SYSTEMS</div>
+          <div>3</div><div>78</div><div><b>B+</b></div>
+          <div><button class="action" id="action">•••</button></div>
+        </div>
+      </div>
+
+      <div class="center">
+        <button class="addbtn" id="openAdd">＋ ADD</button>
+      </div>
+
+      <div class="est">Estimated GPS : <span id="gps">3.50</span></div>
+    </main>
+  </div>
+
+  <!-- ===== Modal เดิม ===== -->
+  <dialog id="dlg">
+    <div class="modal">
+      <div class="modal-h">Grade Calculator</div>
+      <form class="modal-b" id="calcForm">
+        <div class="grid2">
+          <input class="ip" name="course_code" placeholder="Course Code" required />
+          <input class="ip" name="course_name" placeholder="Course Name" required />
+          <input class="ip" type="number" name="credit" placeholder="Credit" min="0" step="1" required />
+        </div>
+
+        <div class="radio" style="margin:6px 0 10px">
+          <div>Grading Scale:</div>
+          <label><input type="radio" name="grading_scale" value="AF" checked /> Standard A-F</label>
+          <label><input type="radio" name="grading_scale" value="SU" /> S/U Grading</label>
+        </div>
+
+        <div class="components">
+          <div class="comp-row" style="font-weight:800;color:#1b2b57">
+            <div>Component</div><div>Weight (%)</div><div>Max</div><div>Score</div><div></div>
+          </div>
+          <div id="compZone"></div>
+          <button class="pill-btn" id="addComp" type="button">ADD Component</button>
+        </div>
+
+        <div id="result" style="text-align:center;margin-top:14px;font-weight:800">
+          Total Score : —    Estimated Grade : —
+        </div>
+
+        <div class="right">
+          <button class="calc" id="calcBtn" type="button">Calculate</button>
+          <button class="calc save" id="saveBtn" type="button">Save</button>
+          <button class="calc exit" id="closeBtn" type="button">Exit</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ===== Scripts เดิม ===== -->
+<script src="js/curriculum-master.js"></script>
+<script src="js/user.js"></script>
+<script src="js/app.js"></script>  <script>
+    // โหลดข้อมูลผู้ใช้และอัปเดตหัว
+    document.addEventListener('DOMContentLoaded', () => {
+      const userData = getCurrentUserData();
+      const trackId = userData.info.track_id;
+      document.getElementById('student-badge').textContent =
+        `${userData.info.name} • ${userData.info.id}`;
+      document.getElementById('student-track').textContent =
+        `Track: ${TRACKS_INFO[trackId].full_name}`;
+    });
+
+    // ปุ่ม ☰ / ✕ สำหรับ sidebar (เหมือน dashboard)
+    document.addEventListener('DOMContentLoaded', () => {
+      const sidebar = document.getElementById('sidebar');
+      const openBtn = document.getElementById('menuBtn');
+      const closeBtn = document.getElementById('closeMenu');
+      if (openBtn) openBtn.addEventListener('click', () => sidebar.classList.add('is-open'));
+      if (closeBtn) closeBtn.addEventListener('click', () => sidebar.classList.remove('is-open'));
+    });
+  </script>
+
+  <script src="/js/menu-toggle.js"></script>
+</body>
+</html>

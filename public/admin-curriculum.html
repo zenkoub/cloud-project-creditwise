@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Admin • Curriculum Management | Credit Wise</title>
+  <link href="css/style.css" rel="stylesheet"/>
+  <style>
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .toolbar{display:flex;gap:10px}
+    .btn-sm{border:none;border-radius:999px;padding:8px 14px;font-weight:800;cursor:pointer}
+    .btn-add{background:#2e7d32;color:#fff}
+    .btn-edit{background:#1557d5;color:#fff}
+    .btn-del{background:#ef5350;color:#fff}
+    dialog::backdrop{background:rgba(0,0,0,.25)}
+    dialog{border:none;border-radius:18px;padding:0;max-width:760px;width:92vw}
+    .modal{background:#fff;border-radius:18px;overflow:hidden}
+    .modal-h{background:#1557d5;color:#fff;padding:14px 18px;font-weight:800}
+    .modal-b{padding:16px}
+    .grid{display:grid;grid-template-columns:100px 100px 140px 1fr 90px 100px 100px;gap:8px}
+    .ip{height:36px;border:1px solid #cfe0ff;border-radius:10px;padding:0 10px}
+    .right{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+
+    /* ปุ่ม ✕ */
+    .close-btn{
+      position:absolute; top:10px; right:10px;
+      width:36px; height:36px; border-radius:10px;
+      border:1px solid rgba(255,255,255,.25);
+      background:rgba(255,255,255,.12);
+      color:#e9f1ff; font-size:20px; line-height:1;
+      display:none; align-items:center; justify-content:center;
+      cursor:pointer;
+    }
+    .sidebar.is-open .close-btn{display:inline-flex;}
+    @media (min-width:1025px){.close-btn{display:none!important;}}
+    .sidebar .side-title{position:relative;padding-right:48px;}
+  </style>
+</head>
+
+<script>
+(function(){
+  const role = localStorage.getItem('cw_role');
+  if (role !== 'admin') {
+    alert('Access Denied: Admin only');
+    window.location.href = 'index.html';
+  }
+})();
+</script>
+
+<body class="bg admin-page">
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="side-title">
+        <div class="hat"></div>
+        <div>Credit Wise</div>
+      </div>
+
+      <!-- ปุ่ม ✕ -->
+      <button class="close-btn" id="closeSidebar" aria-label="Close menu">×</button>
+
+      <a class="side-btn" href="admin-dashboard.html">Dashboard</a>
+      <a class="side-btn" href="admin-students.html">Student Management</a>
+      <a class="side-btn active" href="admin-curriculum.html">Curriculum Management</a>
+      <a class="side-btn" href="index.html">Sign out</a>
+    </aside>
+
+    <main>
+      <div class="mobile-topbar">
+        <button class="hamburger" id="menuBtn" aria-label="Toggle menu">☰</button>
+      </div>
+
+      <div class="topbar">
+        <h2 style="margin:0;color:#fff">Curriculum Management</h2>
+        <div class="toolbar">
+          <button class="btn-sm btn-add" id="btnAdd">ADD</button>
+          <button class="btn-sm btn-edit" id="btnEdit">EDIT</button>
+          <button class="btn-sm btn-del" id="btnDelete">DELETE</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tbl-head">Year 1 • Semester 1</div>
+        <table id="courseTable">
+          <thead>
+            <tr>
+              <th style="width:6%"></th>
+              <th style="width:8%">Year</th>
+              <th style="width:8%">Semester</th>
+              <th style="width:12%">Course Code</th>
+              <th>Course Name</th>
+              <th style="width:8%">Credit</th>
+              <th style="width:10%">Capacity</th>
+              <th style="width:10%">Enroll</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modal Add/Edit -->
+  <dialog id="dlg">
+    <div class="modal">
+      <div class="modal-h" id="dlgTitle">Add Course</div>
+      <form class="modal-b" id="courseForm">
+        <input name="id" type="hidden"/>
+        <div class="grid">
+          <input class="ip" type="number" name="year" placeholder="Year" min="1" max="8" required />
+          <input class="ip" type="number" name="semester" placeholder="Sem" min="1" max="3" required />
+          <input class="ip" name="code" placeholder="Course Code" required />
+          <input class="ip" name="name" placeholder="Course Name" required />
+          <input class="ip" type="number" name="credit" placeholder="Credit" min="0" step="1" required />
+          <input class="ip" type="number" name="capacity" placeholder="Capacity" min="0" step="1" />
+          <input class="ip" type="number" name="enroll" placeholder="Enroll" min="0" step="1" />
+        </div>
+        <div class="right">
+          <button class="btn-sm btn-add" type="submit">Save</button>
+          <button class="btn-sm btn-del" id="closeDlg" type="button">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="js/admin.js"></script>
+  <script>
+    const tableBody = document.querySelector('#courseTable tbody');
+    const dlg = document.getElementById('dlg');
+    const form = document.getElementById('courseForm');
+    const dlgTitle = document.getElementById('dlgTitle');
+
+    function render(){
+      const data = window.cwAdmin.getCourses?.() || [];
+      tableBody.innerHTML = data.map(c=>`
+        <tr>
+          <td><input type="radio" name="sel" value="${c.id}"></td>
+          <td>Year ${c.year}</td>
+          <td>${c.semester}</td>
+          <td>${c.code}</td>
+          <td>${c.name}</td>
+          <td>${c.credit}</td>
+          <td>${c.capacity ?? 0}</td>
+          <td>${c.enroll ?? 0}</td>
+        </tr>
+      `).join('');
+    }
+    render();
+
+    document.getElementById('btnAdd').onclick = ()=>{
+      dlgTitle.textContent='Add Course'; form.reset(); form.id.value=''; dlg.showModal();
+    };
+    document.getElementById('btnEdit').onclick = ()=>{
+      const id=document.querySelector('input[name="sel"]:checked')?.value;
+      if(!id) return alert('เลือกแถวที่ต้องการแก้ไขก่อน');
+      const c=window.cwAdmin.getCourses().find(x=>String(x.id)===String(id));
+      dlgTitle.textContent='Edit Course';
+      form.id.value=c.id; form.year.value=c.year; form.semester.value=c.semester;
+      form.code.value=c.code; form.name.value=c.name;
+      form.credit.value=c.credit; form.capacity.value=c.capacity??0; form.enroll.value=c.enroll??0;
+      dlg.showModal();
+    };
+    document.getElementById('btnDelete').onclick = ()=>{
+      const id=document.querySelector('input[name="sel"]:checked')?.value;
+      if(!id) return alert('เลือกแถวที่ต้องการลบก่อน');
+      if(confirm('ยืนยันลบรายวิชา?')){window.cwAdmin.deleteCourse(Number(id));render();}
+    };
+    form.onsubmit = e=>{
+      e.preventDefault();
+      const p={
+        id:form.id.value?Number(form.id.value):null,
+        year:Number(form.year.value),
+        semester:Number(form.semester.value),
+        code:form.code.value.trim(),
+        name:form.name.value.trim(),
+        credit:Number(form.credit.value),
+        capacity:Number(form.capacity.value||0),
+        enroll:Number(form.enroll.value||0)
+      };
+      p.id?window.cwAdmin.updateCourse(p):window.cwAdmin.addCourse(p);
+      dlg.close();render();
+    };
+    document.getElementById('closeDlg').onclick=()=>dlg.close();
+
+    // เปิด/ปิด sidebar
+    document.addEventListener("DOMContentLoaded",()=>{
+      const sidebar=document.getElementById("sidebar");
+      document.getElementById("menuBtn")?.addEventListener("click",()=>sidebar.classList.toggle("is-open"));
+      document.getElementById("closeSidebar")?.addEventListener("click",()=>sidebar.classList.remove("is-open"));
+    });
+  </script>
+</body>
+</html>

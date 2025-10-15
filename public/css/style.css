@@ -616,3 +616,61 @@ body.bg.login-page main.login-wrap{
 .admin-page .page-head {
   margin-top: 0 !important;        /* เอา margin เดิมออกกันซ้ำซ้อน */
 }
+
+.side-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.mobile-topbar{ display:none; position:fixed; left:12px; top:12px; z-index:1200; }
+.side-close{ display:none; }
+@media (max-width:1024px){
+  .mobile-topbar{ display:block; }
+  .side-close{ display:inline-flex; }
+}
+
+/* ซ่อนปุ่ม ☰ ตอน sidebar เปิดอยู่ */
+.sidebar.is-open ~ main .mobile-topbar {
+  display: none !important;
+}
+
+/* ===== ปรับตำแหน่ง badge (ชื่อผู้ใช้) ให้กลับไปชิดขวา ===== */
+.page-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.page-head .badge {
+  margin-left: auto;
+}
+
+/* ===== FIX: enable scroll on long content ===== */
+.layout {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
+  overflow: visible;
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;       /* ✅ ให้ main scroll ได้ */
+  max-height: 100vh;      /* จำกัดสูงสุดเท่าหน้าจอ */
+  padding-bottom: 40px;   /* เว้นช่องล่างหน่อยให้ไม่ติดขอบ */
+}
+
+.sidebar {
+  position: fixed;
+  overflow-y: auto;       /* ✅ sidebar scroll ได้ถ้ามีเนื้อหาเยอะ */
+  max-height: 100vh;
+}
+
+/* ป้องกัน scrollbar ของ sidebar ทับ content */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.25);
+  border-radius: 3px;
+}
