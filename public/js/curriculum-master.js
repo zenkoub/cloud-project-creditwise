@@ -1,4 +1,5 @@
-const TRACKS_INFO = {
+//js/curriculum-master.js
+window.TRACKS_INFO = {
     "SD": { "name": "Software Development", "full_name": "Software Development" },
     "ITI": { "name": "IT Infrastructure", "full_name": "Information Technology Infrastructure" },
     "MM": { "name": "Multimedia & Game", "full_name": "Multimedia for Interactive Media, Web and Game Development" }
@@ -7,7 +8,7 @@ const TRACKS_INFO = {
 // ----------------------------------------------------
 // โครงสร้างหลักสูตร Master
 // ----------------------------------------------------
-const MASTER_CURRICULUM = {
+window.MASTER_CURRICULUM = {
     // ----------------------------------------------------
     // CORE: วิชาแกน (สีเหลือง)
     // ----------------------------------------------------

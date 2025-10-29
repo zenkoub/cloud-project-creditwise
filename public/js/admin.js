@@ -1,106 +1,232 @@
-// admin.js
+// js/admin.js
+(function (global) {
+    'use strict'; // Enable strict mode for better error detection
 
-(function(global){
-    const KEY_STU = 'cw_students';
-    
-    let courseList = []; 
+    let courseList = [];
     let nextId = 1;
+    let hasInitializedCourses = false; // Flag to prevent multiple initializations
 
-    // Helper: สร้าง List Course จาก MASTER_CURRICULUM (รันครั้งเดียว)
+    // --- Course Initialization ---
+
+    /**
+     * Initializes the global course list from MASTER_CURRICULUM.
+     * Safe to call multiple times (idempotent).
+     * Dispatches 'coursesInitialized' event on successful completion.
+     */
     function initializeMasterCourses() {
-        if (!global.MASTER_CURRICULUM) {
-             // ถ้าเรียกใช้เร็วเกินไป
-             return [];
+        if (hasInitializedCourses || !global.MASTER_CURRICULUM) {
+            if (!global.MASTER_CURRICULUM) {
+                console.warn("⚠️ MASTER_CURRICULUM not found when attempting initialization.");
+            }
+            return; // Exit if already run or master data isn't ready
         }
-        
+
+        console.log("🚀 Initialize Master Course Running...");
+
         let tempCourseList = [];
         let currentId = 1;
-        
         const masterData = global.MASTER_CURRICULUM;
-        const allTracks = ['CORE', ...Object.keys(masterData).filter(k => k !== 'CORE')];
+        // Use CORE first, then other tracks
+        const allTracks = ['CORE', ...Object.keys(masterData).filter(k => k !== 'CORE').sort()];
+
+        // Use a Set to efficiently track added identifiers (code-year-sem-track)
+        const addedIdentifiers = new Set();
 
         for (const trackId of allTracks) {
             const trackData = masterData[trackId];
             if (!trackData) continue;
 
+            // Iterate through years (Year 1, Year 2, etc.)
             for (const yearKey in trackData) {
-                for (const semesterKey in trackData[yearKey]) {
-                    const courses = trackData[yearKey][semesterKey];
-                    
-                    courses.forEach(c => {
-                        const uniqueIdentifier = `${c.code}-${yearKey}-${semesterKey}-${trackId}`;
-                        
-                        const isDuplicate = tempCourseList.some(existing => existing.identifier === uniqueIdentifier);
-                        if (trackId !== 'CORE' && isDuplicate) return;
+                if (!Object.hasOwnProperty.call(trackData, yearKey)) continue;
 
-                        const yearNum = parseInt(yearKey.replace('Year ', ''));
-                        let semMatch = semesterKey.match(/\d/);
-                        const semesterNum = semMatch ? parseInt(semMatch[0]) : 0; 
+                // Iterate through semesters within the year
+                for (const semesterKey in trackData[yearKey]) {
+                    if (!Object.hasOwnProperty.call(trackData[yearKey], semesterKey)) continue;
+
+                    const courses = trackData[yearKey][semesterKey];
+                    // Ensure courses is an array before iterating
+                    if (!Array.isArray(courses)) {
+                        console.warn(`Expected an array for courses in ${trackId}/${yearKey}/${semesterKey}, but got:`, courses);
+                        continue;
+                    }
+
+                    courses.forEach(c => {
+                        // Basic validation of the course object from MASTER_CURRICULUM
+                        if (!c || !c.code || !c.name || typeof c.credit !== 'number') {
+                            console.warn(`Skipping invalid course object in ${trackId}/${yearKey}/${semesterKey}:`, c);
+                            return; // Skip this invalid course object
+                        }
+
+                        // Identifier to prevent adding the exact same course definition multiple times
+                        // (e.g., a CORE course listed under both CORE and a specific track for the same semester)
+                        const uniqueIdentifier = `${c.code}-${yearKey}-${semesterKey}-${trackId}`;
+                        const simpleIdentifier = `${c.code}-${yearKey}-${semesterKey}`; // For checking CORE duplicates
+
+                        // Prevent adding the exact same definition twice
+                        if (addedIdentifiers.has(uniqueIdentifier)) {
+                            return;
+                        }
+                        // Prevent adding a track-specific version if the CORE version already exists
+                        if (trackId !== 'CORE' && addedIdentifiers.has(`${c.code}-${yearKey}-${semesterKey}-CORE`)) {
+                            return;
+                        }
+
+                        addedIdentifiers.add(uniqueIdentifier); // Mark this specific definition as added
+
+                        const yearNum = parseInt(yearKey.replace('Year ', ''), 10) || 0;
+                        const semMatch = semesterKey.match(/\d/);
+                        // Map semester: 1, 2, or 0 (treat Summer as 0 internally for easier sorting/filtering maybe?)
+                        const semesterNum = semMatch ? parseInt(semMatch[0], 10) : (semesterKey.toLowerCase().includes('summer') ? 0 : 0);
 
                         tempCourseList.push({
                             id: currentId++,
-                            identifier: uniqueIdentifier, 
+                            // identifier: uniqueIdentifier, // Keep if needed for debugging
                             year: yearNum,
-                            semester: semesterNum,
+                            semester: semesterNum, // Use 0 for Summer
                             code: c.code,
                             name: c.name,
                             credit: c.credit,
-                            capacity: c.capacity || 80, 
-                            enroll: c.enroll || 0,
                             type: c.type || 'N/A',
-                            track: trackId, 
-                            semester_key: semesterKey 
+                            track: trackId === 'CORE' ? 'Core' : trackId, // Standardize 'Core' label
+                            semester_key: semesterKey, // Keep original key for reference if needed
+                            credit_format: c.credit_format || null // Add credit format
                         });
                     });
                 }
             }
         }
+
         courseList = tempCourseList;
         nextId = currentId;
+        hasInitializedCourses = true; // Set flag
+        console.log(`✅ Master course initialized: ${courseList.length} courses`);
+
+        // Notify other scripts that courses are ready
+        global.dispatchEvent(new CustomEvent('coursesInitialized'));
     }
 
-    // Logic Seeding Student (ใช้ localStorage)
-    function seed() {
-        if (!localStorage.getItem(KEY_STU)){
-            const students = [
-                { id: 1, name:'Peerapat', surname:'Meesangngoen', email:'66070138@kmitl.ac.th', credit:33, gpa:3.10, status:'Normal', statusCls:'pass' },
-                { id: 2, name:'Thanakorn', surname:'W.', email:'66070xxx@kmitl.ac.th', credit:28, gpa:2.85, status:'Normal', statusCls:'pass' },
-                { id: 3, name:'Jirapat', surname:'K.', email:'66070yyy@kmitl.ac.th', credit:18, gpa:1.95, status:'Probation', statusCls:'fail' },
-            ];
-            localStorage.setItem(KEY_STU, JSON.stringify(students));
+    /**
+     * Gets the current course list, attempting initialization if needed.
+     * Returns a sorted **copy** of the course list.
+     */
+    function getCourses() {
+        // Attempt initialization if not done yet and master data is available
+        if (!hasInitializedCourses && global.MASTER_CURRICULUM) {
+            initializeMasterCourses();
         }
-        
-        // 🚀 เรียกใช้ initialization Master Courses ทันทีถ้าข้อมูล Master พร้อม
-        if (global.MASTER_CURRICULUM) {
-             initializeMasterCourses();
+        // Return a sorted copy
+        return [...courseList].sort((a, b) =>
+            a.year - b.year ||
+            a.semester - b.semester ||
+            (a.track === 'Core' ? -1 : (b.track === 'Core' ? 1 : a.track.localeCompare(b.track))) || // Core first, then sort tracks
+            a.code.localeCompare(b.code)
+        );
+    }
+
+    // --- Admin Name Loading ---
+
+    /** Loads and displays the logged-in admin's name. */
+    function loadAdminName() {
+        try {
+            if (typeof getCurrentUserData !== 'function') {
+                throw new Error('getCurrentUserData function not found. Ensure user.js is loaded before admin.js.');
+            }
+            const userData = getCurrentUserData(); // Assumes user.js provides this based on localStorage
+            const adminNameElement = document.getElementById('admin-name');
+
+            if (adminNameElement) { // Only proceed if the element exists
+                if (userData && userData.info && userData.info.role === 'admin') {
+                    const nameParts = userData.info.name.split('(');
+                    adminNameElement.textContent = `(${nameParts[0].trim()})`;
+                } else {
+                    // Could happen if localStorage is cleared or role is wrong
+                    console.warn("Could not find valid admin user data.");
+                    adminNameElement.textContent = '(Admin)'; // Default fallback
+                }
+            }
+        } catch (error) {
+            console.error("Error loading admin name:", error);
+            const adminNameElement = document.getElementById('admin-name');
+            if (adminNameElement) {
+                adminNameElement.textContent = '(Error)';
+            }
         }
     }
-    
-    document.addEventListener('DOMContentLoaded', seed);
 
-    function getCourses(){
-        // 🚀 บังคับ initialize ถ้า courseList ยังว่าง (แก้ปัญหา Timing)
-        if (courseList.length === 0 && global.MASTER_CURRICULUM) {
-             initializeMasterCourses();
+    // --- Initialization ---
+
+    /** Main initialization function called when DOM is ready. */
+    function initializeAdmin() {
+        // 1. Try to initialize courses immediately if MASTER_CURRICULUM is already loaded
+        initializeMasterCourses();
+
+        // 2. Load admin name (requires DOM element 'admin-name')
+        loadAdminName();
+
+        // 3. Fallback: If courses weren't initialized yet (MASTER_CURRICULUM loaded late),
+        //    listen for the 'load' event as a final attempt.
+        if (!hasInitializedCourses) {
+            global.addEventListener('load', () => {
+                initializeMasterCourses(); // Try again on window load
+            }, { once: true }); // Ensure listener runs only once
         }
-        return courseList.sort((a,b)=> a.year-b.year || a.semester-b.semester || a.code.localeCompare(b.code));
     }
-    
-    // ... (ส่วน CRUD อื่นๆ และ getStudents ยังคงเดิม) ...
 
+    // Run initialization when the DOM is fully loaded and parsed
+    document.addEventListener('DOMContentLoaded', initializeAdmin);
+
+
+    // --- Public API ---
     global.cwAdmin = {
-        getStudents: () => JSON.parse(localStorage.getItem(KEY_STU) || '[]'),
-        getCourses,
-        addCourse: (c) => {
-            c.id = nextId++;
-            courseList.push(c); 
+        // getStudents: () => JSON.parse(localStorage.getItem(KEY_STU) || '[]'), // Removed student data logic
+        getCourses, // Provides a sorted copy
+
+        addCourse: (courseData) => {
+            if (!courseData || !courseData.code || !courseData.name || typeof courseData.credit !== 'number' || typeof courseData.year !== 'number' || typeof courseData.semester !== 'number') {
+                console.error("Invalid course data for add:", courseData);
+                return false; // Indicate failure
+            }
+            courseData.id = nextId++;
+            courseData.track = courseData.track || "Core"; // Ensure track defaults to 'Core'
+            courseList.push(courseData);
+            console.log("Added course:", courseData.id, courseData.code);
+            // Optional: Dispatch an event to notify UI about the change
+            // global.dispatchEvent(new CustomEvent('coursesUpdated'));
+            return true; // Indicate success
         },
-        updateCourse: (c) => {
-            const i = courseList.findIndex(x=>x.id===c.id);
-            if(i>=0){ courseList[i]={...courseList[i], ...c}; }
+
+        updateCourse: (courseData) => {
+            if (!courseData || typeof courseData.id !== 'number' || !courseData.code || !courseData.name || typeof courseData.credit !== 'number' || typeof courseData.year !== 'number' || typeof courseData.semester !== 'number') {
+                 console.error("Invalid course data for update:", courseData);
+                 return false; // Indicate failure
+            }
+            const index = courseList.findIndex(x => x.id === courseData.id);
+            if (index !== -1) {
+                // Merge new data onto existing data, ensuring required fields are present
+                courseList[index] = { ...courseList[index], ...courseData };
+                console.log("Updated course:", courseData.id, courseData.code);
+                // Optional: Dispatch an event to notify UI about the change
+                // global.dispatchEvent(new CustomEvent('coursesUpdated'));
+                return true; // Indicate success
+            }
+            console.warn("Course not found for update:", courseData.id);
+            return false; // Indicate failure
         },
+
         deleteCourse: (id) => {
-            courseList = courseList.filter(x=>x.id!==id);
+            const initialLength = courseList.length;
+            courseList = courseList.filter(x => x.id !== id);
+            const success = courseList.length < initialLength;
+            if (success) {
+                console.log("Deleted course:", id);
+                // Optional: Dispatch an event to notify UI about the change
+                // global.dispatchEvent(new CustomEvent('coursesUpdated'));
+            } else {
+                 console.warn("Course not found for delete:", id);
+            }
+            return success; // Indicate success/failure
         }
     };
-})(window);
+
+})(window); // Pass window explicitly
