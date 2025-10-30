@@ -96,7 +96,7 @@ app.use((req, res, next) => {
 // ----------------------------------------------------
 // 5. Start Server
 // ----------------------------------------------------
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 // timeout settings to prevent 503 bad gateway error
