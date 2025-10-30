@@ -1,3 +1,5 @@
+// public/js/login.js
+
 document.addEventListener('DOMContentLoaded', () => {
   const loginForm = document.getElementById('loginForm');
   const userInput = document.getElementById('user');
@@ -7,46 +9,52 @@ document.addEventListener('DOMContentLoaded', () => {
   // Clear any previous session on login page load
   localStorage.removeItem('cw_user');
   localStorage.removeItem('cw_role');
+  localStorage.removeItem('cw_token'); // ล้าง token
 
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault(); // Prevent default form submission
+  loginForm.addEventListener('submit', async (e) => { // เปลี่ยนเป็น async
+    e.preventDefault();
 
-    const userId = userInput.value.trim();
+    const username = userInput.value.trim();
     const password = passInput.value.trim();
 
-    // Basic validation (optional, HTML5 'required' handles most)
-    if (!userId || !password) {
+    if (!username || !password) {
       alert('Please enter both User ID and Password.');
       return;
     }
 
-    // --- Authentication Logic ---
-    const userData = USER_DATA[userId]; // Access global USER_DATA from user.js
+    try {
+      // --- Authentication Logic: Call API ---
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
 
-    if (userData?.info?.password === password) {
-      // Successful Login
-      const userRole = userData.info.role;
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Invalid User ID or Password.');
+      }
 
-      // Store user ID and role in localStorage
-      localStorage.setItem('cw_user', userData.info.id);
-      localStorage.setItem('cw_role', userRole);
+      const data = await response.json();
+
+      // Store user ID, role, and most importantly, the TOKEN
+      localStorage.setItem('cw_token', data.token);
+      localStorage.setItem('cw_user', data.user.username);
+      localStorage.setItem('cw_role', data.user.role);
 
       // Redirect based on role
-      if (userRole === 'admin') {
-        window.location.href = 'admin-curriculum.html'; // Or admin-students.html
-      } else if (userRole === 'student') {
+      if (data.user.role === 'admin') {
+        window.location.href = 'admin-curriculum.html';
+      } else if (data.user.role === 'student') {
         window.location.href = 'dashboard.html';
       } else {
-        // Fallback for unexpected roles (shouldn't happen with good data)
         alert('Login successful, but user role is undefined. Redirecting to login.');
-        localStorage.removeItem('cw_user'); // Clear invalid login
-        localStorage.removeItem('cw_role');
+        localStorage.clear();
         window.location.href = 'index.html';
       }
 
-    } else {
-      // Failed Login
-      alert('Invalid User ID or Password.');
+    } catch (err) {
+      alert(err.message);
       passInput.value = ''; // Clear password field after failed attempt
       userInput.select(); // Focus back on user ID field
     }

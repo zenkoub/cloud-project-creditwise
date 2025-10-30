@@ -1,15 +1,18 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // --- Global Variables & Initial Setup ---
-  const userData = getCurrentUserData(); // Assumes Auth Guard ran
+// public/js/grade-entry.js
 
-  // Defensive coding: Ensure necessary data exists
+document.addEventListener('DOMContentLoaded', async () => { // *** เปลี่ยนเป็น async ***
+  
+  // --- Global Variables & Initial Setup ---
+  const userData = await getCurrentUserData(); // *** เปลี่ยนเป็น await ***
+  if (!userData) return;
+
+  // ... (โค้ดส่วนอื่น ๆ เหมือนเดิม) ...
   if (!userData.grades) userData.grades = {};
   if (!userData.user_electives) userData.user_electives = {};
   if (!userData.free_electives) userData.free_electives = [];
 
   const GRADE_OPTIONS = ['—', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F', 'W', 'S', 'U'];
 
-  // Cache DOM elements
   const yearSelect = document.getElementById('sel-year');
   const semesterSelect = document.getElementById('sel-semester');
   const trackSelect = document.getElementById('sel-track');
@@ -20,17 +23,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const termEarnedCreditEl = document.getElementById('term-earned-credit');
   const termGpaEl = document.getElementById('term-gpa');
 
-  // --- Helper Functions ---
+  // --- Helper Functions (gradeToPoint, getStatusFromGrade, createGradeDropdown, getSemesterKey เหมือนเดิม) ---
   function gradeToPoint(grade) {
-    // S/U grades don't contribute to GPA calculation points
     const map = { "A": 4.0, "B+": 3.5, "B": 3.0, "C+": 2.5, "C": 2.0, "D+": 1.5, "D": 1.0, "F": 0.0 };
-    return map[grade] ?? 0.0; // Return 0.0 if grade is not in map (like W, S, U, —)
+    return map[grade] ?? 0.0;
   }
 
   function getStatusFromGrade(grade) {
       if (['F', 'W', 'U', '—'].includes(grade)) return grade;
       if (['A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'S'].includes(grade)) return 'Passed';
-      return '—'; // Default or unknown status
+      return '—';
   }
 
   function createGradeDropdown(identifier, currentGrade = '—') {
@@ -48,30 +50,54 @@ document.addEventListener('DOMContentLoaded', () => {
     let semesterKey = `Semester ${semester}`;
     if (semester.toLowerCase() === 'summer') semesterKey = 'Summer';
 
-    // Apply Co-op/Non-Co-op suffix based on rules
     if (year === 3 || year === 4) {
       const planSuffix = ` (${studyPlan === "Co-op" ? 'Co-op' : 'Non-Co-op'})`;
-      // Apply suffix usually to Semester 2 and Summer, and specific Year 4 Sem 1 cases
       if (semester === "2" || semester.toLowerCase() === 'summer') {
           semesterKey = `Semester 2${planSuffix}`;
       } else if (year === 4 && semester === "1") {
           semesterKey = `Semester 1${planSuffix}`;
       }
-      // Year 3 Sem 1 typically doesn't have suffix, handled implicitly
     }
     return semesterKey;
   }
+  
+  // *** ฟังก์ชันใหม่: ส่งเกรดไปบันทึกที่ API ***
+  async function saveGradeToApi(code, grade, status) {
+      const token = localStorage.getItem('cw_token');
+      if (!token) return;
+
+      const payload = { course_code: code, grade, status };
+      try {
+          const response = await fetch('/api/users/me/grades', {
+              method: 'PUT',
+              headers: { 
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(payload)
+          });
+          
+          if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(errorData.error || 'Failed to save grade on server.');
+          }
+          // console.log(`Grade for ${code} saved successfully.`);
+      } catch (error) {
+          console.error(`API Save Error for ${code}:`, error);
+          alert(`Error saving grade for ${code}: ${error.message}`);
+      }
+  }
+
 
   // --- Core Logic Functions ---
 
   // Saves grade from dropdown/input change
-  function saveGradeChange(element) {
+  async function saveGradeChange(element) { // *** เปลี่ยนเป็น async ***
     const grade = element.value;
     const id = element.dataset.id; // Identifier (course code or slot_id)
     const row = element.closest('tr');
     const isSlot = row.dataset.type === 'slot';
     const isFree = row.dataset.type === 'free';
-
     const status = getStatusFromGrade(grade);
 
     if (isSlot) {
@@ -80,62 +106,58 @@ document.addEventListener('DOMContentLoaded', () => {
       const name = row.querySelector('[data-field="name"]').value.trim();
       const credit = parseInt(row.querySelector('[data-field="credit"]').value, 10) || 0;
       userData.user_electives[slotId] = { code, name, credit, grade, status, slot_id: slotId, is_user_entry_slot: true };
+      // NOTE: Electives/Free Electives ไม่ถูกบันทึกใน API นี้ ต้องปรับปรุง API ในภายหลัง
+      // if (code !== 'Enter Code') await saveGradeToApi(code, grade, status);
     } else if (isFree) {
-      const oldCode = row.dataset.code; // Use original code as key initially
-      const newCode = row.querySelector('[data-field="code"]').value.trim(); // Get potentially new code
+      const oldCode = row.dataset.code;
+      const newCode = row.querySelector('[data-field="code"]').value.trim();
       const name = row.querySelector('[data-field="name"]').value.trim();
       const credit = parseInt(row.querySelector('[data-field="credit"]').value, 10) || 0;
 
       const index = userData.free_electives.findIndex(c => c.code === oldCode);
       if (index !== -1) {
-        // Update existing free elective, including potentially its code
         userData.free_electives[index] = { code: newCode, name, credit, grade, status };
-        // Update the row's data-code attribute if the code changed
         if (oldCode !== newCode) {
             row.dataset.code = newCode;
-            // Update the grade dropdown data-id as well if it uses code
             const gradeSelect = row.querySelector('.grade');
             if (gradeSelect && gradeSelect.dataset.id === oldCode) {
                 gradeSelect.dataset.id = newCode;
             }
         }
       }
+      // NOTE: Electives/Free Electives ไม่ถูกบันทึกใน API นี้
     } else { // Regular course from curriculum
       if (userData.grades.hasOwnProperty(id)) {
         userData.grades[id].grade = grade;
         userData.grades[id].status = status;
       } else {
-        // Handle case where grade might not exist yet (though unlikely if rendered)
         userData.grades[id] = { grade, status, credit: parseInt(row.querySelector('td:nth-child(3)')?.textContent || '0') };
       }
+      // *** บันทึกเกรดของวิชาปกติเข้า DB ***
+      await saveGradeToApi(id, grade, status);
     }
 
-    // After saving any change, re-render everything to reflect updates and recalculate stats
-    // Consider optimizing later if performance becomes an issue
     renderTables();
   }
 
    // Saves elective details (code, name, credit) from input change
   function saveElectiveDetailChange(element) {
-    const row = element.closest('tr');
-    const type = row.dataset.type;
-    const gradeSelect = row.querySelector('.grade');
-    const grade = gradeSelect ? gradeSelect.value : '—'; // Get current grade from dropdown
-
-    if (type === 'slot') {
-        const slotId = row.dataset.slotId;
-        saveGradeChange(element); // Let saveGradeChange handle saving slot details
-    } else if (type === 'free') {
-        const oldCode = row.dataset.code;
-        saveGradeChange(element); // Let saveGradeChange handle saving free elective details
-    }
+    // โค้ดส่วนนี้ยังทำงานกับ Local userData เท่านั้น (สำหรับ Electives/Free)
+    // การบันทึกเกรดเข้า DB จะเกิดเมื่อมีการเปลี่ยนเกรดใน saveGradeChange
+    saveGradeChange(element); 
   }
 
 
   // Renders both main course table and elective table based on selection
   function renderTables() {
+    // NOTE: Assuming window.MASTER_CURRICULUM is still loaded via curriculum-master.js
+    if (typeof window.MASTER_CURRICULUM === 'undefined') {
+        mainTbody.innerHTML = `<tr><td colspan="4" class="text-center muted">Error: Curriculum master data not available.</td></tr>`;
+        return;
+    }
+
     const selectedYear = parseInt(yearSelect.value, 10);
-    const selectedSemester = semesterSelect.value; // Keep as string ('1', '2', 'summer')
+    const selectedSemester = semesterSelect.value;
     const trackId = userData.info.track_id;
     const studyPlan = userData.info.study_plan;
     const masterCore = window.MASTER_CURRICULUM["CORE"] || {};
@@ -145,10 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const semesterKey = getSemesterKey(selectedYear, selectedSemester, studyPlan);
 
     // --- Get Courses for the Main Table ---
-    const coreCourses = masterCore[yearKey]?.[`Semester ${selectedSemester}`] || []; // Core uses simple sem key
+    const coreCourses = masterCore[yearKey]?.[`Semester ${selectedSemester}`] || [];
     const trackCourses = masterTrack[yearKey]?.[semesterKey] || [];
 
-    // Combine, excluding slots and duplicates
     let mainTableCourses = [];
     let electiveSlots = [];
 
@@ -161,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     combinedCurriculum.forEach(course => {
         if (course.is_user_entry_slot) {
-            electiveSlots.push(course); // Keep slots separate for elective table
+            electiveSlots.push(course);
         } else {
             mainTableCourses.push(course);
         }
@@ -170,13 +191,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Render Main Course Table ---
     if (mainTableCourses.length > 0) {
       mainTbody.innerHTML = mainTableCourses.map(course => {
+        // ใช้ credit จาก DB (ถ้ามี) หรือใช้จาก Master (ถ้าไม่มี)
         const gradeInfo = userData.grades[course.code];
         const grade = gradeInfo?.grade || '—';
+        const credit = gradeInfo?.credit || course.credit; 
+
         return `
           <tr data-code="${course.code}" data-type="main">
             <td>${course.code}</td>
             <td style="text-align: left;">${course.name}</td>
-            <td>${course.credit}</td>
+            <td>${credit}</td>
             <td>${createGradeDropdown(course.code, grade)}</td>
           </tr>
         `;
@@ -185,14 +209,15 @@ document.addEventListener('DOMContentLoaded', () => {
       mainTbody.innerHTML = `<tr><td colspan="4" class="text-center muted">No required courses for this term.</td></tr>`;
     }
 
-    // --- Render Elective Entry Table ---
+    // --- Render Elective Entry Table (เหมือนเดิม) ---
+    // ... (Elective rendering logic is the same) ...
     let electiveHtml = '';
     // 1. Render slots from the curriculum for this term
     electiveSlots.forEach(slot => {
         const userEntry = userData.user_electives[slot.slot_id];
         const code = userEntry?.code || 'Enter Code';
-        const name = userEntry?.name || slot.name; // Default to slot name
-        const credit = userEntry?.credit || slot.credit || 3; // Default credit
+        const name = userEntry?.name || slot.name;
+        const credit = userEntry?.credit || slot.credit || 3;
         const grade = userEntry?.grade || '—';
         electiveHtml += `
           <tr data-slot-id="${slot.slot_id}" data-type="slot">
@@ -240,26 +265,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 1. Process main curriculum courses
     mainCourses.forEach(course => {
-      const credit = course.credit || 0;
+      // ใช้ credit จาก DB (ถ้ามี)
       const gradeInfo = userData.grades[course.code];
+      const credit = gradeInfo?.credit || course.credit || 0;
       const grade = gradeInfo?.grade || '—';
 
-      if (credit > 0 && grade !== '—' && grade !== 'W') { // Count attempted if not withdrawn or pending
+      if (credit > 0 && grade !== '—' && grade !== 'W') {
           totalCreditAttempted += credit;
-          if (!['F', 'U'].includes(grade)) { // Count earned if passed (A-D, S)
+          if (!['F', 'U'].includes(grade)) {
               earnedCredit += credit;
           }
-          if (!['S', 'U'].includes(grade)) { // Count for GPA if not S/U
+          if (!['S', 'U'].includes(grade)) {
               totalCreditForGPA += credit;
               totalGradePoints += credit * gradeToPoint(grade);
           }
       }
     });
 
-    // 2. Process filled elective slots
+    // 2. Process filled elective slots (Same as original)
     electiveSlots.forEach(slot => {
         const userEntry = userData.user_electives[slot.slot_id];
-        if (userEntry && userEntry.code !== 'Enter Code') { // Only count if filled
+        if (userEntry && userEntry.code !== 'Enter Code') {
             const credit = userEntry.credit || 0;
             const grade = userEntry.grade || '—';
 
@@ -277,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    // 3. Process free electives
+    // 3. Process free electives (Same as original)
     userData.free_electives.forEach(course => {
       const credit = course.credit || 0;
       const grade = course.grade || '—';
@@ -299,35 +325,29 @@ document.addEventListener('DOMContentLoaded', () => {
     termTotalCreditEl.textContent = totalCreditAttempted;
     termEarnedCreditEl.textContent = earnedCredit;
     termGpaEl.textContent = termGPA.toFixed(2);
-
-    // Optional: Add credit limit check (can be noisy)
-    // const remainingTotalCredit = 144; // Example total needed
-    // const isFinalYear = (parseInt(yearSelect.value) === 4);
-    // checkCreditLimit(totalCreditAttempted, yearSelect.value, semesterSelect.value, remainingTotalCredit, isFinalYear);
   }
 
-  // Adds a new row for a free elective
+  // Adds a new row for a free elective (Same as original)
   function addFreeElective() {
-    // Generate a somewhat unique placeholder code
     const newCode = `FE-${Date.now().toString().slice(-5)}`;
     userData.free_electives.push({ code: newCode, name: 'New Free Elective', credit: 3, grade: '—', status: '—' });
-    renderTables(); // Re-render to show the new row
+    renderTables();
   }
 
-  // Removes a free elective
+  // Removes a free elective (Same as original)
   function removeFreeElective(code) {
       const initialLength = userData.free_electives.length;
       userData.free_electives = userData.free_electives.filter(c => c.code !== code);
       if (userData.free_electives.length < initialLength) {
-           renderTables(); // Re-render only if something was removed
+           renderTables();
       }
   }
 
-  // Clears data for a specific elective slot (sets back to default placeholder)
+  // Clears data for a specific elective slot (Same as original)
   function clearElectiveSlot(slotId) {
       if (userData.user_electives[slotId]) {
            delete userData.user_electives[slotId];
-           renderTables(); // Re-render to show placeholder again
+           renderTables();
       }
   }
 
@@ -335,8 +355,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Initialization ---
   function initializePage() {
     // Populate header
-    document.getElementById('student-badge').textContent = `${userData.info.name || 'N/A'} • ${userData.info.id || 'N/A'}`;
+    document.getElementById('student-badge').textContent = `${userData.info.name || 'N/A'} • ${userData.info.username || 'N/A'}`;
     const trackId = userData.info.track_id;
+    // NOTE: Assuming window.TRACKS_INFO is still loaded via curriculum-master.js
     const trackName = (trackId && trackId !== "N/A" && window.TRACKS_INFO && window.TRACKS_INFO[trackId])
                         ? window.TRACKS_INFO[trackId].full_name
                         : '(No Track Selected)';
@@ -344,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Populate Year selector
     const currentYear = userData.info.current_year || 1;
-    yearSelect.innerHTML = [...Array(5)].map((_, i) => // Allow up to Year 5
+    yearSelect.innerHTML = [...Array(5)].map((_, i) =>
       `<option value="${i + 1}" ${i + 1 === currentYear ? 'selected' : ''}>Year ${i + 1}</option>`
     ).join('');
 
@@ -356,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <option value="summer" ${currentSemester === 'summer' ? 'selected' : ''}>Summer</option>
     `;
 
-    // Populate and disable Track selector (display only)
+    // Populate and disable Track selector
     if (trackId && trackId !== "N/A" && window.TRACKS_INFO && window.TRACKS_INFO[trackId]) {
       trackSelect.innerHTML = `<option value="${trackId}">${trackName}</option>`;
       trackSelect.value = trackId;
@@ -385,15 +406,8 @@ document.addEventListener('DOMContentLoaded', () => {
              if (code && confirm(`Remove free elective ${code}?`)) {
                  removeFreeElective(code);
              }
-         } else if (action === 'remove-slot') {
-             // Currently disabled, but logic would be:
-             // const slotId = event.target.dataset.slotId;
-             // if (slotId && confirm(`Clear data for slot ${slotId}?`)) {
-             //     clearElectiveSlot(slotId);
-             // }
          }
      });
-
 
     // Initial render
     renderTables();

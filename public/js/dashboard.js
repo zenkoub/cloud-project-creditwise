@@ -1,4 +1,4 @@
-// js/dashboard.js
+// public/js/dashboard.js
 
 google.charts.load('current', { packages: ['corechart'] });
 google.charts.setOnLoadCallback(initializeDashboard);
@@ -20,63 +20,62 @@ function drawGpaChart(history) {
   // Clear previous content (like 'Loading chart...')
   chartElement.innerHTML = '';
 
-  // Handle case with no history data
   if (!history || history.length === 0) {
       chartElement.innerHTML = '<p class="text-center muted" style="padding-top: 50px;">No GPA history data to display chart.</p>';
-      return; // Stop execution if no data
+      return;
   }
 
   // Prepare data with HTML tooltips
   const chartDataArray = [['Term', 'GPAX', { role: 'tooltip', type: 'string', p: { html: true } }, 'Term GPA', { role: 'tooltip', type: 'string', p: { html: true } }]];
   history.forEach(item => {
-      const gpaxTooltip = `<div style="padding:5px;"><b>${item.term}</b><br>GPAX: <b>${item.gpax.toFixed(2)}</b></div>`;
-      const gpaTooltip = `<div style="padding:5px;"><b>${item.term}</b><br>Term GPA: <b>${item.term_gpa.toFixed(2)}</b></div>`;
+      // ต้องมั่นใจว่า gpax และ term_gpa เป็นตัวเลข
+      const gpaxValue = parseFloat(item.gpax) || 0;
+      const termGpaValue = parseFloat(item.term_gpa) || 0;
+
+      const gpaxTooltip = `<div style="padding:5px;"><b>${item.term}</b><br>GPAX: <b>${gpaxValue.toFixed(2)}</b></div>`;
+      const gpaTooltip = `<div style="padding:5px;"><b>${item.term}</b><br>Term GPA: <b>${termGpaValue.toFixed(2)}</b></div>`;
       chartDataArray.push([
           item.term,
-          item.gpax,
+          gpaxValue,
           gpaxTooltip,
-          item.term_gpa,
+          termGpaValue,
           gpaTooltip
       ]);
   });
 
   const data = google.visualization.arrayToDataTable(chartDataArray);
 
-  // Chart Options - Replaced CSS Variables with Hex Codes
   const options = {
-    legend: { position: 'bottom', textStyle: { color: '#6a7fb7', fontSize: 12 } }, // --text-secondary
+    legend: { position: 'bottom', textStyle: { color: '#6a7fb7', fontSize: 12 } },
     curveType: 'function',
-    chartArea: { left: 50, top: 20, width: '80%', height: '65%' }, // Adjusted width slightly
-    colors: ['#1557d5', '#7ba8ff'], // <-- --primary-color, --primary-light
+    chartArea: { left: 50, top: 20, width: '80%', height: '65%' },
+    colors: ['#1557d5', '#7ba8ff'],
     lineWidth: 3,
     backgroundColor: 'transparent',
     hAxis: {
-      textStyle: { color: '#6a7fb7', fontSize: 11 }, // --text-secondary
-      titleTextStyle: { color: '#6a7fb7'}, // --text-secondary
+      textStyle: { color: '#6a7fb7', fontSize: 11 },
+      titleTextStyle: { color: '#6a7fb7'},
       gridlines: { color: 'transparent' }
     },
     vAxis: {
       minValue: 0,
       maxValue: 4,
       ticks: [0, 1, 2, 3, 4],
-      textStyle: { color: '#6a7fb7', fontSize: 11 }, // --text-secondary
-      titleTextStyle: { color: '#6a7fb7'}, // --text-secondary
-      gridlines: { color: '#eef2ff', count: 5 }, // --border-color
+      textStyle: { color: '#6a7fb7', fontSize: 11 },
+      titleTextStyle: { color: '#6a7fb7'},
+      gridlines: { color: '#eef2ff', count: 5 },
       minorGridlines: { count: 0 },
       viewWindow: { min: 0, max: 4.1 },
-      baselineColor: '#cfe0ff' // --border-color-alt
+      baselineColor: '#cfe0ff'
     },
     tooltip: { isHtml: true, trigger: 'focus' },
     pointSize: 5,
     series: {
         0: { pointShape: 'circle' },
         1: { pointShape: 'square' }
-    },
-    // Removed explorer options for simplicity, add back if needed
-    // explorer: { actions: ['dragToZoom', 'rightClickToReset'], axis: 'horizontal', keepInBounds: true, maxZoomIn: 4.0 }
+    }
   };
 
-  // Draw the chart
   if (!currentChartInstance) {
       currentChartInstance = new google.visualization.LineChart(chartElement);
   }
@@ -88,73 +87,52 @@ function updateDashboardInfo(userData) {
     console.error("User data is missing or incomplete.");
     document.getElementById('student-badge').textContent = 'Error';
     document.getElementById('student-track').textContent = 'Track: Error';
-     // Redirect or show a more prominent error
-     alert("Error loading user data. Please log in again.");
-     localStorage.clear();
-     window.location.href = 'index.html';
     return;
   }
 
-  const history = userData.academic_history || []; // Ensure history is an array
+  const history = userData.academic_history || [];
   const trackId = userData.info.track_id;
-
+  // NOTE: Assuming window.TRACKS_INFO is still loaded via curriculum-master.js
   const trackName = (trackId && trackId !== "N/A" && window.TRACKS_INFO && window.TRACKS_INFO[trackId])
                     ? window.TRACKS_INFO[trackId].full_name
                     : '(No Track Selected)';
 
   document.getElementById('student-badge').textContent =
-    `${userData.info.name || 'N/A'} • ${userData.info.id || 'N/A'}`;
+    `${userData.info.name || 'N/A'} • ${userData.info.username || 'N/A'}`; // ใช้ username แทน ID (ที่อาจจะเป็นเลขฐานข้อมูล)
   document.getElementById('student-track').textContent = `Track: ${trackName}`;
 
   const latest = history.length ? history[history.length - 1] : { gpax: 0, term_gpa: 0 };
-  document.getElementById('gpax-value').textContent = latest.gpax.toFixed(2);
-  document.getElementById('gpa-value').textContent = latest.term_gpa.toFixed(2);
+  document.getElementById('gpax-value').textContent = (parseFloat(latest.gpax) || 0).toFixed(2);
+  document.getElementById('gpa-value').textContent = (parseFloat(latest.term_gpa) || 0).toFixed(2);
 
   const gradeListElement = document.getElementById('grade-history-list');
   if (history.length > 0) {
       gradeListElement.innerHTML = history
           .slice()
           .reverse()
-          .map(item => `<div><span>${item.term}</span><b>${item.term_gpa.toFixed(2)}</b></div>`)
+          .map(item => `<div><span>${item.term}</span><b>${(parseFloat(item.term_gpa) || 0).toFixed(2)}</b></div>`)
           .join('');
   } else {
-      gradeListElement.innerHTML = '<p class="text-center muted" style="padding: 10px;">No history data.</p>'; // Adjusted padding
+      gradeListElement.innerHTML = '<p class="text-center muted" style="padding: 10px;">No history data.</p>';
   }
 
-  // Draw or redraw the chart - Called here ensures data is ready
   drawGpaChart(history);
 }
 
-function initializeDashboard() {
-  const userData = getCurrentUserData(); // Get user data (already guarded by HTML script)
-
-  // Add extra safety check for userData itself
-  if (!userData) {
-      console.error("Failed to get user data.");
-       alert("Could not load user data. Please try logging in again.");
-       localStorage.clear();
-       window.location.href = 'index.html';
-      return;
-  }
-
-   // Ensure academic_history exists (Defensive)
-   if (!userData.academic_history) {
-      userData.academic_history = [];
-   }
-   // Add checks for other essential properties if needed
+// *** แก้ฟังก์ชันนี้ให้เป็น async ***
+async function initializeDashboard() {
+  const userData = await getCurrentUserData(); // <<< เปลี่ยนเป็น await
+  if (!userData) return;
 
   updateDashboardInfo(userData);
 }
 
-// Redraw chart on window resize (Debounced)
 let resizeTimer;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-        // Re-fetch data or use existing if state management isn't complex
-        const userData = getCurrentUserData();
+        const userData = window.__cachedUserData; // ใช้ข้อมูลที่ cache ไว้
         if (userData && userData.academic_history) {
-            // Re-drawing requires the history data
             drawGpaChart(userData.academic_history);
         }
     }, 250);

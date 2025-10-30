@@ -1,4 +1,32 @@
 ///js/app.js
+fetch('/api/users/me', { // Or other endpoints
+  headers: {
+    'Authorization': `Bearer ${token}` // Include the token
+  }
+})
+.then(response => {
+  if (response.status === 401 || response.status === 403) {
+     // Token invalid/expired - Redirect to login
+     alert('Session expired. Please log in again.');
+     localStorage.clear();
+     window.location.href = 'index.html';
+     return; // Stop processing
+  }
+  if (!response.ok) {
+     throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+})
+.then(data => {
+  // Process the data from the API
+  console.log(data);
+  // Example: updateDashboardInfo(data);
+})
+.catch(error => {
+  console.error('Error fetching data:', error);
+  // Display an error message to the user
+});
+
 // ใช้ใน planner.html
 (function () {
   const dlg = document.getElementById('dlg');

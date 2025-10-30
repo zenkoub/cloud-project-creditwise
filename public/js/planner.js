@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => { // <<< เพิ่ม async ที่นี่
     // --- Globals & DOM Cache ---
     const PLANNER_STORAGE_KEY = 'cw_planner_courses';
     const courseListContainer = document.getElementById('course-list-container');
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function gradeMap(gradeScale = 'AF') {
-        if (gradeScale === 'SU') return { S: 1, U: 0 }; // Example value, not used for GPA
+        if (gradeScale === 'SU') return { S: 1, U: 0 };
         return { "A": 4.0, "B+": 3.5, "B": 3.0, "C+": 2.5, "C": 2.0, "D+": 1.5, "D": 1.0, "F": 0.0 };
     }
 
@@ -114,12 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
-    // --- Modal Logic ---
+    // --- Modal Logic (omitted for brevity) ---
     function openModalForAdd() {
         modalTitle.textContent = 'Add New Course';
         form.reset();
-        courseIdInput.value = ''; // Ensure no ID for adding
-        compZone.innerHTML = ''; // Clear components
+        courseIdInput.value = '';
+        compZone.innerHTML = '';
         ensureOneComponentRow();
         resultEl.textContent = 'Total Score: — | Estimated Grade: —';
         modal.showModal();
@@ -130,22 +130,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!course) return;
 
         modalTitle.textContent = 'Edit Course';
-        form.reset(); // Reset first
+        form.reset();
         courseIdInput.value = course.id;
         form.course_code.value = course.code || '';
         form.course_name.value = course.name || '';
         form.credit.value = course.credit || '';
         form.grading_scale.value = course.gradeScale || 'AF';
 
-        // Populate components
-        compZone.innerHTML = ''; // Clear existing
+        compZone.innerHTML = '';
         if (course.components && course.components.length > 0) {
             course.components.forEach(comp => addComponentRow(comp.name, comp.weight, comp.max, comp.score));
         } else {
-            ensureOneComponentRow(); // Add one blank row if no components saved
+            ensureOneComponentRow();
         }
 
-        // Display saved score/grade
         resultEl.textContent = `Total Score: ${course.score !== undefined ? Math.round(course.score) : '—'} | Estimated Grade: ${course.grade || '—'}`;
 
         modal.showModal();
@@ -184,12 +182,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function calculateScoreAndGrade() {
         const scale = form.grading_scale.value || 'AF';
         let totalScore = 0;
-        let totalWeight = 0; // To check if weights sum up reasonably
+        let totalWeight = 0;
         const componentsData = [];
 
         compZone.querySelectorAll('.comp-row').forEach(row => {
             const nameInput = row.querySelector('[name="comp_name"]');
-            // Skip header row if present (based on lack of input or specific class if added)
             if (!nameInput) return;
 
             const name = nameInput.value.trim();
@@ -197,28 +194,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const max = parseFloat(row.querySelector('[name="max_score"]').value) || 0;
             const score = parseFloat(row.querySelector('[name="score"]').value) || 0;
 
-            if (weight > 0 && max > 0) { // Only calculate score for valid components
+            if (weight > 0 && max > 0) {
                 totalScore += weight * (score / max);
             }
-            totalWeight += weight; // Sum weights regardless for validation check
+            totalWeight += weight;
 
-             // Store component data for saving later
             componentsData.push({ name, weight, max, score });
         });
 
-        // Optional: Warn if weights don't sum near 100
-        // if (Math.abs(totalWeight - 100) > 1 && totalWeight > 0) { // Tolerance of 1%
-        //     console.warn(`Component weights sum to ${totalWeight.toFixed(1)}%, expected 100%.`);
-        //     // Optionally display a warning to the user
-        // }
-
-        // Clamp total score between 0 and 100
         totalScore = Math.max(0, Math.min(100, totalScore));
 
         let grade = "—";
         if (scale === "SU") {
             grade = totalScore >= 60 ? "S" : "U";
-        } else { // Standard A-F
+        } else {
             if (totalScore >= 80) grade = "A";
             else if (totalScore >= 75) grade = "B+";
             else if (totalScore >= 70) grade = "B";
@@ -234,18 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleSave() {
-        // Perform calculation first to get results
         const { totalScore, grade, componentsData } = calculateScoreAndGrade();
 
         const courseData = {
-            id: courseIdInput.value || null, // Get ID if editing
+            id: courseIdInput.value || null,
             code: form.course_code.value.trim().toUpperCase(),
             name: form.course_name.value.trim(),
             credit: parseInt(form.credit.value, 10) || 0,
             gradeScale: form.grading_scale.value,
             score: totalScore,
             grade: grade,
-            components: componentsData // Save the component details
+            components: componentsData
         };
 
         if (!courseData.code || !courseData.name || courseData.credit <= 0) {
@@ -259,12 +247,10 @@ document.addEventListener('DOMContentLoaded', () => {
             addCourse(courseData);
         }
 
-        modal.close(); // Close modal after successful save
+        modal.close();
     }
 
-    // --- Action Menu Logic ---
     function showActionMenu(buttonElement, courseId) {
-        // Remove any existing menus
         document.querySelectorAll('.context-menu').forEach(menu => menu.remove());
 
         const course = plannerCourses.find(c => c.id === courseId);
@@ -280,17 +266,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Position the menu below the button
         const btnRect = buttonElement.getBoundingClientRect();
-        menu.style.position = 'absolute'; // Use absolute positioning
-        menu.style.top = `${window.scrollY + btnRect.bottom + 2}px`; // Position below button, account for scroll
-        menu.style.left = `${window.scrollX + btnRect.left}px`; // Align left edge
+        menu.style.position = 'absolute';
+        menu.style.top = `${window.scrollY + btnRect.bottom + 2}px`;
+        menu.style.left = `${window.scrollX + btnRect.left}px`;
 
          // Prevent menu from going off-screen right
         if (menu.offsetLeft + menu.offsetWidth > window.innerWidth - 10) {
             menu.style.left = `${window.innerWidth - menu.offsetWidth - 10}px`;
         }
-        // Prevent menu from going off-screen bottom (less common)
         if (menu.offsetTop + menu.offsetHeight > window.innerHeight - 10) {
-            menu.style.top = `${window.scrollY + btnRect.top - menu.offsetHeight - 2}px`; // Position above
+            menu.style.top = `${window.scrollY + btnRect.top - menu.offsetHeight - 2}px`;
         }
 
 
@@ -306,35 +291,31 @@ document.addEventListener('DOMContentLoaded', () => {
             menu.remove();
         });
 
-        // Close menu when clicking outside
-        // Use setTimeout to allow the current click event to finish
         setTimeout(() => {
             document.addEventListener('click', function closeMenuHandler(e) {
                 if (!menu.contains(e.target) && !buttonElement.contains(e.target)) {
                     menu.remove();
-                    document.removeEventListener('click', closeMenuHandler); // Clean up listener
+                    document.removeEventListener('click', closeMenuHandler);
                 }
-            }, { capture: true, once: true }); // Use capture phase and remove after one use
+            }, { capture: true, once: true });
         }, 0);
     }
 
 
-    // --- Event Listeners ---
+    // --- Event Listeners (omitted for brevity) ---
     openModalBtn.addEventListener('click', openModalForAdd);
     closeBtn.addEventListener('click', () => modal.close());
-    addCompBtn.addEventListener('click', () => addComponentRow()); // Add blank row
+    addCompBtn.addEventListener('click', () => addComponentRow());
     calcBtn.addEventListener('click', calculateScoreAndGrade);
     saveBtn.addEventListener('click', handleSave);
 
-    // Event delegation for removing component rows
     compZone.addEventListener('click', (e) => {
         if (e.target.classList.contains('remove')) {
             e.target.closest('.comp-row').remove();
-            ensureOneComponentRow(); // Make sure at least one row remains if all are deleted
+            ensureOneComponentRow();
         }
     });
 
-    // Event delegation for action menus on course cards
     courseListContainer.addEventListener('click', (e) => {
         if (e.target.classList.contains('action')) {
             const card = e.target.closest('.list-card');
@@ -347,9 +328,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initial Load ---
     // Load user info for header
-    const userData = getCurrentUserData();
+    const userData = await getCurrentUserData(); // <<< แก้ไข: เพิ่ม await
      if (userData && userData.info) {
-        document.getElementById('student-badge').textContent = `${userData.info.name || 'N/A'} • ${userData.info.id || 'N/A'}`;
+        // ใช้ username แทน ID เพื่อความถูกต้อง
+        document.getElementById('student-badge').textContent = `${userData.info.name || 'N/A'} • ${userData.info.username || 'N/A'}`;
         const trackId = userData.info.track_id;
         const trackName = (trackId && trackId !== "N/A" && window.TRACKS_INFO && window.TRACKS_INFO[trackId])
                             ? window.TRACKS_INFO[trackId].full_name
@@ -360,4 +342,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load courses from local storage
     loadCoursesFromStorage();
 
-}); // End DOMContentLoaded
+});
