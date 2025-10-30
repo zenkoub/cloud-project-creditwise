@@ -83,7 +83,12 @@ router.get('/students/:username/history', async (req, res) => {
 // GET /api/admin/courses (ดึงข้อมูลหลักสูตรทั้งหมด)
 router.get('/courses', async (req, res) => {
   try {
-    const result = await query('SELECT * FROM courses ORDER BY track_id, year, semester, code');
+    // MODIFIED: Exclude user-added electives (USER_FE, USER_GE) from admin view
+    const result = await query(
+      `SELECT * FROM courses 
+       WHERE track_id NOT IN ('USER_FE', 'USER_GE', 'USER_MISC')
+       ORDER BY track_id, year, semester, code`
+    );
     res.json(result.rows);
   } catch (err) {
     console.error('Admin courses error:', err);
