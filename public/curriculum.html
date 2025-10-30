@@ -7,177 +7,51 @@
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body class="bg user-page">
+
+  <script>
+    (function () {
+      const userId = localStorage.getItem('cw_user');
+      const userRole = localStorage.getItem('cw_role');
+      if (!userId || userRole !== 'student') {
+        alert('Please log in as a student to access this page.');
+        window.location.href = 'index.html';
+      }
+    })();
+  </script>
+
   <div class="layout">
-    <!-- ===== SIDEBAR ===== -->
     <aside class="sidebar" id="sidebar">
       <div class="side-title">
-        <div class="hat"></div>
-        <div>Credit Wise 🎓</div>
-        <!-- ปุ่มปิด sidebar -->
+        <div class="hat"></div> <div>Credit Wise 🎓</div>
         <button class="hamburger side-close" id="closeMenu" aria-label="Close menu">✕</button>
       </div>
-
-      <a class="side-btn" href="dashboard.html">Dashboard</a>
-      <a class="side-btn active" href="curriculum.html">Curriculum Plan</a>
-      <a class="side-btn" href="grade-entry.html">Grade Entry</a>
-      <a class="side-btn" href="planner.html">Planner</a>
-      <a class="side-btn" href="index.html">Sign Out</a>
+      <nav>
+        <a class="side-btn" href="dashboard.html">📈 Dashboard</a>
+        <a class="side-btn active" href="curriculum.html">📚 Curriculum Plan</a>
+        <a class="side-btn" href="grade-entry.html">📝 Grade Entry</a>
+        <a class="side-btn" href="planner.html">🗓️ Planner</a>
+        <a class="side-btn side-btn-bottom" href="index.html">🚪 Sign Out</a>
+      </nav>
     </aside>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <main>
-      <!-- ปุ่มเปิด sidebar (เฉพาะจอเล็ก) -->
       <div class="mobile-topbar">
         <button class="hamburger" id="menuBtn" aria-label="Toggle menu">☰</button>
       </div>
 
-      <div class="page-head" style="margin-top: 5%;">
-        <div class="badge" id="student-badge"></div>
-      </div>
+      <header class="page-head">
+        <h2>Curriculum Plan</h2>
+         <div class="user-info-header">
+            <div class="badge" id="student-badge">Loading...</div>
+            <div id="student-track" class="muted">Track: Loading...</div>
+        </div>
+      </header>
 
-      <div class="page-head">
-        <h2 style="margin:0;color:#fff;text-shadow:2px 2px 3px #182747;">Curriculum Plan</h2>
-        <div id="student-track" style="color:#040431;"></div>
-      </div>
-
-      <div class="card" id="curriculum-container"></div>
+      <section class="card" id="curriculum-container">
+        <p class="text-center muted">Loading curriculum...</p>
+      </section>
     </main>
   </div>
 
-  <!-- ===== JS ===== -->
-  <script src="js/curriculum-master.js"></script>
-  <script src="js/user.js"></script>
-
-  <script>
-    function renderCurriculum() {
-      const userData = getCurrentUserData();
-      const trackId = userData.info.track_id;
-      const studyPlan = userData.info.study_plan;
-      const masterCore = MASTER_CURRICULUM["CORE"];
-      const masterTrack = MASTER_CURRICULUM[trackId];
-      const container = document.getElementById("curriculum-container");
-      let htmlContent = "";
-
-      document.getElementById("student-badge").textContent =
-        `${userData.info.name} • ${userData.info.id}`;
-      document.getElementById("student-track").textContent =
-        `Track: ${TRACKS_INFO[trackId].full_name} (${studyPlan})`;
-
-      const years = ["Year 1", "Year 2", "Year 3", "Year 4"];
-
-      for (const year of years) {
-        const coreYear = masterCore[year] || {};
-        const trackYear = masterTrack[year] || {};
-        const allSemesterKeys = new Set([
-          ...Object.keys(coreYear),
-          ...Object.keys(trackYear),
-        ]);
-
-        for (const semesterKey of Array.from(allSemesterKeys).sort()) {
-          if (year === "Year 3" || year === "Year 4") {
-            const isCoopKey = semesterKey.includes("(Co-op)");
-            const isNonCoopKey = semesterKey.includes("(Non-Co-op)");
-            if (studyPlan === "Co-op" && isNonCoopKey) continue;
-            if (studyPlan === "Non-Co-op" && isCoopKey) continue;
-          }
-
-          const coreCourses = coreYear[semesterKey] || [];
-          const trackCourses = trackYear[semesterKey] || [];
-          const finalCourses = [
-            ...coreCourses,
-            ...trackCourses.filter(
-              (tc) => !coreCourses.some((cc) => cc.code === tc.code)
-            ),
-          ];
-
-          if (finalCourses.length === 0) continue;
-
-          const displaySemester = semesterKey.replace(/\s*\([^)]*\)/g, "");
-          const tblHead = `${year} • ${displaySemester}`;
-
-          htmlContent += `<div class="tbl-head">${tblHead}</div>`;
-          htmlContent +=
-            '<table><thead><tr><th>Course Code</th><th>Course Name</th><th>Credit</th><th>Grade</th><th>Status</th></tr></thead><tbody>';
-
-          finalCourses.forEach((course) => {
-            let finalCourse = course;
-            let gradeInfo = userData.grades[course.code];
-
-            if (
-              course.is_user_entry_slot &&
-              userData.user_electives[course.slot_id]
-            ) {
-              finalCourse = userData.user_electives[course.slot_id];
-              gradeInfo = finalCourse;
-            }
-
-            const grade = gradeInfo ? gradeInfo.grade : "—";
-            const status = gradeInfo ? gradeInfo.status : "—";
-            let statusClass = "none";
-            if (status === "Passed" || status === "Paased") statusClass = "pass";
-            else if (status === "Withdrawn") statusClass = "wait";
-            else if (status === "Failed") statusClass = "fail";
-
-            htmlContent += `
-              <tr>
-                <td>${finalCourse.code}</td>
-                <td>${finalCourse.name}</td>
-                <td>${finalCourse.credit}</td>
-                <td>${grade}</td>
-                <td><span class="ic ${statusClass}"><span class="dot"></span>${status}</span></td>
-              </tr>`;
-          });
-
-          htmlContent += "</tbody></table>";
-        }
-      }
-
-      if (userData.free_electives && userData.free_electives.length > 0) {
-        htmlContent += `<div class="tbl-head">Free Electives (วิชาเสรีที่เพิ่มเอง)</div>`;
-        htmlContent +=
-          '<table><thead><tr><th>Course Code</th><th>Course Name</th><th>Credit</th><th>Grade</th><th>Status</th></tr></thead><tbody>';
-
-        userData.free_electives.forEach((course) => {
-          const status = course.status || "—";
-          let statusClass = "none";
-          if (status === "Passed" || status === "Paased") statusClass = "pass";
-          else if (status === "Withdrawn") statusClass = "wait";
-          else if (status === "Failed") statusClass = "fail";
-
-          htmlContent += `
-            <tr>
-              <td>${course.code}</td>
-              <td>${course.name}</td>
-              <td>${course.credit}</td>
-              <td>${course.grade}</td>
-              <td><span class="ic ${statusClass}"><span class="dot"></span>${status}</span></td>
-            </tr>`;
-        });
-        htmlContent += "</tbody></table>";
-      }
-
-      container.innerHTML = htmlContent;
-    }
-
-    document.addEventListener("DOMContentLoaded", renderCurriculum);
-  </script>
-
-  <!-- ระบบเปิด-ปิด sidebar -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const sidebar = document.getElementById("sidebar");
-      const openBtn = document.getElementById("menuBtn");
-      const closeBtn = document.getElementById("closeMenu");
-
-      if (openBtn)
-        openBtn.addEventListener("click", () =>
-          sidebar.classList.add("is-open")
-        );
-      if (closeBtn)
-        closeBtn.addEventListener("click", () =>
-          sidebar.classList.remove("is-open")
-        );
-    });
-  </script>
-</body>
+  <script src="js/curriculum-master.js"></script> <script src="js/user.js"></script> <script src="js/curriculum-display.js"></script> <script src="js/menu-toggle.js"></script> </body>
 </html>

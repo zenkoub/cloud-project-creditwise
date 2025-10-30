@@ -5,137 +5,83 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard | Credit Wise</title>
   <link rel="stylesheet" href="css/style.css" />
-
   <script src="https://www.gstatic.com/charts/loader.js"></script>
-  <script src="js/curriculum-master.js"></script>
-  <script src="js/user.js"></script>
-
-  <script>
-    google.charts.load('current', { packages: ['corechart'] });
-
-    function drawChart(history) {
-      if (typeof google === 'undefined' || !google.visualization || !google.visualization.arrayToDataTable) return;
-
-      const chartDataArray = [['Term', 'GPAX', 'GPA']];
-      history.forEach(item => chartDataArray.push([item.term, item.gpax, item.term_gpa]));
-
-      const data = google.visualization.arrayToDataTable(chartDataArray);
-      const options = {
-        legend: { position: 'bottom' },
-        curveType: 'function',
-        chartArea: { left: 40, top: 10, width: '85%', height: '70%' },
-        colors: ['#1557d5', '#7ba8ff'],
-        lineWidth: 3,
-        backgroundColor: '#ffffff',
-        hAxis: { textStyle: { color: '#1b2b57' } },
-        vAxis: { minValue: 0, maxValue: 4, ticks: [0, 1, 2, 3, 4], textStyle: { color: '#1b2b57' } }
-      };
-      new google.visualization.LineChart(document.getElementById('curve_chart')).draw(data, options);
-    }
-
-    function updateDashboardInfo() {
-      const userData = getCurrentUserData();
-      const history = userData.academic_history || [];
-      const trackId = userData.info.track_id;
-      const trackName = window.TRACKS_INFO?.[trackId]?.full_name || 'N/A';
-
-      document.getElementById('student-badge').textContent =
-        `${userData.info.name || 'N/A'} • ${userData.info.id || 'N/A'}`;
-      document.getElementById('student-track').textContent = `Track: ${trackName}`;
-
-      const latest = history.length ? history.at(-1) : { gpax: 0, term_gpa: 0 };
-      document.querySelector('.dash-card.big:nth-child(1) .dash-value').textContent = latest.gpax.toFixed(2);
-      document.querySelector('.dash-card.big:nth-child(2) .dash-value').textContent = latest.term_gpa.toFixed(2);
-
-      const gradeList = document.querySelector('.dash-card.grade-list .grades');
-      gradeList.innerHTML = history
-        .slice()
-        .reverse()
-        .map(item => `<div><span>${item.term}</span><b>${item.term_gpa.toFixed(2)}</b></div>`)
-        .join('');
-
-      google.charts.setOnLoadCallback(() => drawChart(history));
-    }
-
-    document.addEventListener('DOMContentLoaded', updateDashboardInfo);
-    window.addEventListener('resize', () => {
-      const userData = getCurrentUserData?.() || { academic_history: [] };
-      drawChart(userData.academic_history);
-    });
-  </script>
 </head>
 
 <body class="bg user-page">
+
+  <script>
+    (function () {
+      const userId = localStorage.getItem('cw_user');
+      const userRole = localStorage.getItem('cw_role');
+      if (!userId || userRole !== 'student') {
+        alert('Please log in as a student to access this page.');
+        window.location.href = 'index.html';
+      }
+    })();
+  </script>
+
   <div class="layout">
-    
-    <!-- ===== SIDEBAR ===== -->
+
     <aside class="sidebar" id="sidebar">
       <div class="side-title">
-        <div class="hat"></div>
-        <div>Credit Wise 🎓</div>
-        <!-- ปุ่มปิด sidebar -->
+        <div class="hat"></div> <div>Credit Wise 🎓</div>
         <button class="hamburger side-close" id="closeMenu" aria-label="Close menu">✕</button>
       </div>
 
-      <a class="side-btn active" href="dashboard.html">Dashboard</a>
-      <a class="side-btn" href="curriculum.html">Curriculum Plan</a>
-      <a class="side-btn" href="grade-entry.html">Grade Entry</a>
-      <a class="side-btn" href="planner.html">Planner</a>
-      <a class="side-btn" href="index.html">Sign Out</a>
+      <nav>
+        <a class="side-btn active" href="dashboard.html">📈 Dashboard</a>
+        <a class="side-btn" href="curriculum.html">📚 Curriculum Plan</a>
+        <a class="side-btn" href="grade-entry.html">📝 Grade Entry</a>
+        <a class="side-btn" href="planner.html">🗓️ Planner</a>
+        <a class="side-btn side-btn-bottom" href="index.html">🚪 Sign Out</a>
+      </nav>
     </aside>
 
-    <!-- ===== MAIN CONTENT ===== -->
     <main>
-      <!-- ปุ่มเปิด sidebar (เฉพาะจอเล็ก) -->
       <div class="mobile-topbar">
         <button class="hamburger" id="menuBtn" aria-label="Toggle menu">☰</button>
       </div>
 
-      <div class="page-head" style="margin-top: 5%;">
-        <div class="badge" id="student-badge"></div>
-      </div>
+      <header class="page-head">
+        <h2>Dashboard</h2>
+         <div class="user-info-header">
+            <div class="badge" id="student-badge">Loading...</div>
+            <div id="student-track" class="muted">Track: Loading...</div>
+        </div>
+      </header>
 
-      <div class="page-head">
-        <h2 style="margin:0;color:#fff;text-shadow:2px 2px 3px #182747;">Dashboard</h2>
-        <div id="student-track" style="color:#040431;"></div>
-      </div>
+     
 
-      <div class="panel">
+      <section class="panel">
         <h3>Welcome to Credit Wise 🎓</h3>
-        <p>ใช้เมนูซ้ายเพื่อไปยังแต่ละหน้า: <b>Curriculum Plan</b>, <b>Grade Entry</b>, และ <b>Planner</b>.</p>
-        <p>ข้อมูลทั้งหมดถูกดึงจาก JavaScript และเป็นเวอร์ชัน Static สำหรับนำขึ้น AWS.</p>
-      </div>
+        <p>Use the sidebar menu to navigate: <b>Curriculum Plan</b>, <b>Grade Entry</b>, and <b>Planner</b>.</p>
+        <p>This is a static version for demonstration purposes.</p>
+      </section>
 
-      <div class="dash-grid">
+      <section class="dash-grid">
         <div class="dash-card big">
           <div class="dash-title">GPAX</div>
-          <div class="dash-value">—</div>
+          <div class="dash-value" id="gpax-value">—</div>
         </div>
         <div class="dash-card big">
-          <div class="dash-title">GPA</div>
-          <div class="dash-value">—</div>
+          <div class="dash-title">Latest GPA</div>
+          <div class="dash-value" id="gpa-value">—</div>
         </div>
         <div class="dash-card wide">
-          <div id="curve_chart" style="width:100%;height:300px;"></div>
+          <div id="curve_chart">
+             <p class="text-center muted" style="padding-top: 50px;">Loading chart...</p>
+          </div>
         </div>
         <div class="dash-card grade-list">
-          <div class="dash-title">History</div>
-          <div class="grades"></div>
+          <div class="dash-title">GPA History</div>
+          <div class="grades" id="grade-history-list">
+             <p class="text-center muted">No history data.</p>
+          </div>
         </div>
-      </div>
+      </section>
     </main>
   </div>
 
-  <!-- ===== SCRIPT TOGGLE SIDEBAR ===== -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const sidebar  = document.getElementById('sidebar');
-      const openBtn  = document.getElementById('menuBtn');
-      const closeBtn = document.getElementById('closeMenu');
-
-      if (openBtn)  openBtn.addEventListener('click',  () => sidebar.classList.add('is-open'));
-      if (closeBtn) closeBtn.addEventListener('click', () => sidebar.classList.remove('is-open'));
-    });
-  </script>
-</body>
+  <script src="js/curriculum-master.js"></script> <script src="js/user.js"></script> <script src="js/dashboard.js"></script> <script src="js/menu-toggle.js"></script> </body>
 </html>

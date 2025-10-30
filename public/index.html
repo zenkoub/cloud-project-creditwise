@@ -1,26 +1,31 @@
 <!doctype html>
 <html lang="th">
-
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Credit Wise | Login</title>
   <link rel="stylesheet" href="css/style.css" />
-</head>
+  </head>
 
 <body class="bg login-page">
 
+  <header class="brand">
+    <img class="logo" src="img/logo.png" alt="Credit Wise Logo">
+  </header>
+
   <main class="login-wrap">
-    <div class="brand">
-      <img class="logo" src="/img/logo.png">
-    </div>
-    <form id="loginForm">
-      <label for="user">User</label>
-      <input id="user" class="input" type="text" placeholder="student id or email" required />
-      <label for="pass">Password</label>
-      <div class="row">
-        <input id="pass" class="input" type="password" placeholder="••••••••" required minlength="6" />
-        <button class="toggle" type="button" id="toggle">แสดง</button>
+    <h1 class="title">Login</h1>
+    <form id="loginForm" novalidate>
+      <div>
+        <label for="user">User ID</label>
+        <input id="user" class="input" type="text" placeholder="Student ID" required />
+      </div>
+      <div>
+        <label for="pass">Password</label>
+        <div class="row">
+          <input id="pass" class="input" type="password" placeholder="••••••••" required minlength="6" />
+          <button class="toggle" type="button" id="togglePassword">Show</button>
+        </div>
       </div>
       <div class="actions">
         <button class="btn" type="submit">LOGIN</button>
@@ -28,48 +33,9 @@
     </form>
     <p class="foot">© 2025 Credit Wise 🎓</p>
   </main>
+
   <script src="js/user.js"></script>
-  
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', e => {
-      e.preventDefault();
-      const user = document.getElementById('user').value.trim();
-      const pass = document.getElementById('pass').value.trim();
-      // ⚠️ NOTE: รหัสผ่าน 11111111 ถูกใช้เพื่อความสมจริง แต่ไม่มีการตรวจสอบจริงในโค้ดนี้
-
-      // ตรวจ role จาก user
-      let role;
-      if (user.toLowerCase() === 'admin') {
-        role = 'admin';
-        localStorage.setItem('cw_role', role);
-        localStorage.setItem('cw_user', user); // เก็บ user 'admin'
-        window.location.href = 'admin-dashboard.html';
-      } else {
-        role = 'student';
-        // 🚀 ตรวจสอบว่า user ID มีอยู่ใน USER_DATA หรือไม่ (เพิ่มความสมจริง)
-        if (USER_DATA[user]) {
-          localStorage.setItem('cw_role', role);
-          localStorage.setItem('cw_user', user);
-          window.location.href = 'dashboard.html'; // ไปหน้า student
-        } else {
-          alert('User ID ไม่ถูกต้อง หรือไม่มีข้อมูลในระบบ');
-        }
-      }
-    });
-
-    // Code สำหรับปุ่มแสดงรหัสผ่าน (Toggle Password)
-    document.getElementById('toggle').onclick = function () {
-      const passInput = document.getElementById('pass');
-      if (passInput.type === 'password') {
-        passInput.type = 'text';
-        this.textContent = 'ซ่อน';
-      } else {
-        passInput.type = 'password';
-        this.textContent = 'แสดง';
-      }
-    };
-  </script>
+  <script src="js/login.js"></script>
 
 </body>
-
 </html>

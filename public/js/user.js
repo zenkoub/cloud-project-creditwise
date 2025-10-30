@@ -1,139 +1,59 @@
-// NOTE: ข้อมูลใน USER_DATA จะใช้เป็น Mock Database 
-// Key หลักคือ รหัสนักศึกษา (Student ID) หรือ "admin"
+// public/js/user.js
 
-const USER_DATA = {
-    // ----------------------------------------------------
-    // 1. เจ้าหน้าที่ (Admin)
-    // ----------------------------------------------------
-    "admin": {
-        "info": {
-            "name": "Admin Officer",
-            "id": "ADMIN",
-            "track_id": "N/A",
-            "study_plan": "N/A",
-            "current_year": 0,
-            "current_semester": "1"
-        }
-    },
+/**
+ * ฟังก์ชันหลักที่ใช้ดึงข้อมูล User ปัจจุบันจาก Backend API
+ * นี่คือตัวที่มาแทนที่การอ่าน USER_DATA โดยสิ้นเชิง
+ * @returns {Promise<object|null>} ข้อมูลผู้ใช้, หรือ null หากเกิดข้อผิดพลาด
+ */
+async function getCurrentUserData() {
+  const token = localStorage.getItem('cw_token');
+  if (!token) {
+    console.warn('No token found. Redirecting to login.');
+    localStorage.clear();
+    window.location.href = 'index.html';
+    return null;
+  }
 
-    // ----------------------------------------------------
-    // 2. นักศึกษาปี 3 - ITI (User ที่ใช้ในตัวอย่างก่อนหน้า)
-    // ----------------------------------------------------
-    "66070138": {
-        "info": {
-            "name": "Peerapat Meesangngoen",
-            "id": "66070138",
-            "track_id": "ITI",
-            "study_plan": "Non-Co-op",
-            "current_year": 3, 
-            "current_semester": "1"
-        },
-        // รหัสผ่าน: 11111111 (จำลอง)
-        "grades": {
-            // 🚀 เพิ่ม status ที่สอดคล้องกับเกรด
-            "06016402": { "grade": "A", "credit": 3, "status": "Passed" },
-            "06066303": { "grade": "B+", "credit": 3, "status": "Passed" },
-            "06016411": { "grade": "F", "credit": 3, "status": "Failed" }, 
-            "90641001": { "grade": "A", "credit": 3, "status": "Passed" },
-            "90644007": { "grade": "B+", "credit": 3, "status": "Passed" },
-            "06016408": { "grade": "B", "credit": 3, "status": "Passed" },
-            "06066001": { "grade": "C+", "credit": 3, "status": "Passed" },
-            "06066301": { "grade": "W", "credit": 3, "status": "Withdrawn" }, 
-        },
-        "user_electives": {
-            "LNC_ELEC_1": { "code": "90644050", "name": "BUSINESS ENGLISH", "credit": 3, "grade": "B", "status": "Passed", "type": "Gen_LNC_Elective", "slot_id": "LNC_ELEC_1", "is_user_entry_slot": true },
-        },
-        "free_electives": [],
-        "academic_history": [
-             { term: '1/68', term_gpa: 3.40, gpax: 3.40 },
-             { term: '2/68', term_gpa: 2.75, gpax: 3.10 },
-        ]
-    },
-    
-    // ----------------------------------------------------
-    // 3. นักศึกษาปี 2 - SD
-    // ----------------------------------------------------
-    "67070001": {
-        "info": {
-            "name": "Somsak Digital",
-            "id": "67070001",
-            "track_id": "SD",
-            "study_plan": "Non-Co-op",
-            "current_year": 2, 
-            "current_semester": "1"
-        },
-        "grades": {
-            "06016402": { "grade": "B", "credit": 3, "status": "Passed" },
-            "06066303": { "grade": "A", "credit": 3, "status": "Passed" },
-            "06016411": { "grade": "B+", "credit": 3, "status": "Passed" },
-            "90641001": { "grade": "C", "credit": 3, "status": "Passed" },
-            "90644007": { "grade": "C+", "credit": 3, "status": "Passed" },
-        },
-        "user_electives": {},
-        "free_electives": [],
-        "academic_history": [{ term: '1/68', term_gpa: 3.10, gpax: 3.10 }]
-    },
+  try {
+    const response = await fetch('/api/users/me', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}` // ส่ง Token ไปใน Header
+      }
+    });
 
-    // ----------------------------------------------------
-    // 4. นักศึกษาปี 2 - ITI
-    // ----------------------------------------------------
-    "67070002": {
-        "info": {
-            "name": "Saranya Cloud",
-            "id": "67070002",
-            "track_id": "ITI",
-            "study_plan": "Co-op", 
-            "current_year": 2, 
-            "current_semester": "1"
-        },
-        "grades": {
-            "06016402": { "grade": "A", "credit": 3, "status": "Passed" },
-            "06066303": { "grade": "A", "credit": 3, "status": "Passed" },
-            "06016411": { "grade": "A", "credit": 3, "status": "Passed" },
-            "90641001": { "grade": "A", "credit": 3, "status": "Passed" },
-        },
-        "user_electives": {},
-        "free_electives": [],
-        "academic_history": [{ term: '1/68', term_gpa: 4.00, gpax: 4.00 }]
-    },
-
-    // ----------------------------------------------------
-    // 5. นักศึกษาปี 2 - MM
-    // ----------------------------------------------------
-    "67070003": {
-        "info": {
-            "name": "Prayut Media",
-            "id": "67070003",
-            "track_id": "MM",
-            "study_plan": "Non-Co-op",
-            "current_year": 2, 
-            "current_semester": "1"
-        },
-        "grades": {
-            "06016402": { "grade": "D+", "credit": 3, "status": "Passed" },
-            "06066303": { "grade": "C", "credit": 3, "status": "Passed" },
-            "06016411": { "grade": "C", "credit": 3, "status": "Passed" },
-            "90641001": { "grade": "B", "credit": 3, "status": "Passed" },
-            "90644007": { "grade": "B+", "credit": 3, "status": "Passed" },
-            "06066301": { "grade": "F", "credit": 3, "status": "Failed" }, 
-        },
-        "user_electives": {},
-        "free_electives": [],
-        "academic_history": [{ term: '1/68', term_gpa: 2.50, gpax: 2.50 }]
-    }
-};
-
-function getCurrentUserData(userId = null) {
-    if (!userId) {
-        userId = localStorage.getItem('cw_user');
-    }
-    
-    // Fallback: หาก Local Storage ว่าง ให้ใช้ 66070138 เป็น default
-    if (!userId) {
-         userId = "66070138";
+    if (response.status === 401 || response.status === 403) {
+      // Token หมดอายุ หรือไม่ถูกต้อง
+      throw new Error('Session expired. Please log in again.');
     }
 
-    const data = USER_DATA[userId] || USER_DATA["66070138"]; 
-    
-    return data;
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to fetch user data from server.');
+    }
+
+    const userData = await response.json();
+    return userData; // ข้อมูลที่ได้จาก API มีโครงสร้างคล้ายของเก่า { info, grades, academic_history, ... }
+
+  } catch (err) {
+    console.error('Error fetching user data:', err);
+    alert('An error occurred: ' + err.message);
+    localStorage.clear();
+    window.location.href = 'index.html';
+    return null;
+  }
 }
+
+/**
+ * ฟังก์ชันเกรด -> แต้ม ยังคงใช้ได้
+ */
+function gradeToPoint(grade) {
+    const map = { "A": 4.0, "B+": 3.5, "B": 3.0, "C+": 2.5, "C": 2.0, "D+": 1.5, "D": 1.0, "F": 0.0, "W": 0.0, "S": 0.0, "U": 0.0, "—": 0.0 };
+    return map[grade] || 0.0;
+}
+
+// Global functions (เพื่อให้ไฟล์อื่นเรียกใช้ได้)
+window.getCurrentUserData = getCurrentUserData;
+window.gradeToPoint = gradeToPoint;
+
+// *** หมายเหตุ: ไฟล์นี้เดิมมี USER_DATA ซึ่งถูกลบทิ้งไปแล้ว ***

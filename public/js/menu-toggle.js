@@ -1,3 +1,4 @@
+//js/menu-toggle.js
 (function(){
   const btn = document.getElementById('menuBtn');
   const sidebar = document.getElementById('sidebar');
