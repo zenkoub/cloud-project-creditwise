@@ -5,5 +5,4 @@ package.json
 .env
 .DS_Store
 data
-backup.sql
-schema.sql
+*.sql
