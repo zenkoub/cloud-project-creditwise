@@ -1,5 +1,4 @@
 // server.js (แก้ไขเพื่อใช้ Router และ API ก่อน Static Files)
-
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -27,6 +26,9 @@ const pool = new Pool({
   database: process.env.DB_DATABASE,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
+  ssl: {
+    rejectUnauthorized: false 
+  }
 });
 
 pool.connect((err, client, release) => {
@@ -98,5 +100,5 @@ const server = app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
 // timeout settings to prevent 503 bad gateway error
-server.keepAliveTimeout = 61000;
-server.headersTimeout = 62000;
+server.keepAliveTimeout = 61 * 1000;
+server.headersTimeout = 62 * 1000;
