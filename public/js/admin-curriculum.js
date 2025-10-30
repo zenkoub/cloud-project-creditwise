@@ -30,9 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
      function populateTrackSelects() {
-        if (!window.TRACKS_INFO) return;
-        const coreOption = '<option value="CORE">Core Curriculum</option>';
-        const trackOptions = Object.entries(window.TRACKS_INFO).map(([id, info]) => `<option value="${id}">${info.full_name || id}</option>`).join('');
+        const TRACKS_FALLBACK = {
+            SD: { full_name: 'Software Development' },
+            ITI: { full_name: 'Information Technology Infrastructure' },
+            MM: { full_name: 'Multimedia for Interactive Media, Web and Game Development' }
+        };
+        const source = window.TRACKS_INFO || TRACKS_FALLBACK;
+        // Use 'ALL' as the canonical DB track id for courses required for all students
+        const coreOption = '<option value="ALL">CORE (Required for All)</option>';
+        const trackOptions = Object.entries(source).map(([id, info]) => `<option value="${id}">${info.full_name || id}</option>`).join('');
         trackFilterSelect.innerHTML = '<option value="">All Tracks</option>' + coreOption + trackOptions;
         courseTrackSelect.innerHTML = coreOption + trackOptions;
      }
@@ -105,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
      function createInnerTableHTML(courses) {
-         return `<table><thead><tr><th style="width:5%"></th> <th style="width:15%">Code</th><th style="width:55%; text-align: left;">Name</th><th style="width:10%">Credit</th><th style="width:15%">Type/Track</th></tr></thead><tbody>${courses.map(c => `<tr data-id="${c.id}"><td><input type="radio" name="selCourse" value="${c.id}" aria-label="Select course ${c.code}"></td><td>${c.code}</td><td style="text-align: left;">${c.name}</td><td>${c.credit}</td><td class="muted">${c.track_id === 'CORE' ? c.type : c.track_id}</td></tr>`).join('')}</tbody></table>`;
+         return `<table><thead><tr><th style="width:5%"></th> <th style="width:15%">Code</th><th style="width:55%; text-align: left;">Name</th><th style="width:10%">Credit</th><th style="width:15%">Type/Track</th></tr></thead><tbody>${courses.map(c => `<tr data-id="${c.id}"><td><input type="radio" name="selCourse" value="${c.id}" aria-label="Select course ${c.code}"></td><td>${c.code}</td><td style="text-align: left;">${c.name}</td><td>${c.credit}</td><td class="muted">${(c.track_id === 'CORE' || c.track_id === 'ALL') ? c.type : c.track_id}</td></tr>`).join('')}</tbody></table>`;
      }
      
      function renderCoursesGrouped(coursesToRender) {
@@ -132,8 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
                  w.className='track-group-wrapper'; 
                  let tHTML=''; 
                  // Sorting by Track (CORE first)
-                 Object.keys(grouped[y][s]).sort((a,b)=>(a==='CORE'?-1:(b==='CORE'?1:(window.TRACKS_INFO?.[a]?.full_name||a).localeCompare(window.TRACKS_INFO?.[b]?.full_name||b)))).forEach(t=>{ 
-                     const cs=grouped[y][s][t], fN=window.TRACKS_INFO?.[t]?.full_name||t; 
+                 Object.keys(grouped[y][s]).sort((a,b)=>( (a==='CORE' || a==='ALL')?-1:((b==='CORE' || b==='ALL')?1:(window.TRACKS_INFO?.[a]?.full_name||a).localeCompare(window.TRACKS_INFO?.[b]?.full_name||b)) )).forEach(t=>{ 
+                     const cs=grouped[y][s][t], fN=window.TRACKS_INFO?.[t]?.full_name|| (t==='ALL' ? 'CORE (All)' : t); 
                      tHTML+=`<div class="track-group"><h5>🔹 ${fN}</h5>${createInnerTableHTML(cs)}</div>`; 
                  }); 
                  w.innerHTML=tHTML; 
@@ -181,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (f('#courseName')) f('#courseName').value = course.name || '';
           if (f('#courseCredit')) f('#courseCredit').value = course.credit || '';
           if (f('#courseType')) f('#courseType').value = course.type || '';
-          if (f('#courseTrack')) f('#courseTrack').value = course.track_id || 'CORE'; // ใช้ track_id
+          if (f('#courseTrack')) f('#courseTrack').value = course.track_id || 'ALL'; // ใช้ track_id (default ALL for core/all-students)
           if (f('#courseFormat')) f('#courseFormat').value = course.credit_format || '';
           
           if (typeof modal.showModal === 'function') modal.showModal(); else modal.setAttribute('open', '');
@@ -230,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
               year: Number(get('#courseYear')) || 0,
               semester: Number(get('#courseSemester')) || 0,
               type: get('#courseType') || 'Core',
-              track_id: get('#courseTrack') || 'CORE', // ใช้ track_id
+              track_id: get('#courseTrack') || 'ALL', // ใช้ track_id (default ALL for core/all-students)
               credit_format: get('#courseFormat') || ''
           };
 

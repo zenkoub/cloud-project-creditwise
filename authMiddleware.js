@@ -1,30 +1,26 @@
-// authMiddleware.js
-import jwt from 'jsonwebtoken';
+// middleware/authMiddleware.js
+import jwt from "jsonwebtoken";
 
-// ตรวจสอบ Token และเก็บ user info ไว้ใน req.user
+// ✅ ตรวจสอบ JWT token
 export const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
 
-  if (token == null) {
-    return res.status(401).json({ error: 'Access denied. No token provided.' });
+  if (!token) {
+    return res.status(401).json({ error: "No token provided" });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(403).json({ error: 'Invalid or expired token.' });
+      return res.status(403).json({ error: "Invalid or expired token" });
     }
-
-    req.user = user; // { id, username, role }
+    req.user = decoded; // ใส่ข้อมูล user (id, username, role)
     next();
   });
 };
 
-// ตรวจสอบสิทธิ์ Admin
+// ✅ ตรวจสอบว่าเป็น admin หรือไม่
 export const adminMiddleware = (req, res, next) => {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).json({ error: 'Admin access required.' });
-  }
+  if (req.user?.role === "admin") next();
+  else res.status(403).json({ error: "Admin access required" });
 };

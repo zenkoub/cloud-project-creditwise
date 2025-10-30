@@ -30,7 +30,7 @@ router.post('/login', async (req, res) => {
     // 2. สร้าง Token (JWT)
     const payload = { id: user.id, username: user.username, role: user.role };
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1d' });
-
+    
     // 3. ส่ง Token และข้อมูล user กลับไป
     res.json({
       token,

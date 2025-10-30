@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Grade Entry | Credit Wise</title>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body class="bg user-page">
 
   <script>
@@ -22,7 +24,8 @@
   <div class="layout">
     <aside class="sidebar" id="sidebar">
       <div class="side-title">
-        <div class="hat"></div> <div>Credit Wise 🎓</div>
+        <div class="hat"></div>
+        <div>Credit Wise 🎓</div>
         <button class="hamburger side-close" id="closeMenu" aria-label="Close menu">✕</button>
       </div>
       <nav>
@@ -42,16 +45,22 @@
       <header class="page-head">
         <h2>Grade Entry</h2>
         <div class="user-info-header">
-            <div class="badge" id="student-badge">Loading...</div>
-            <div id="student-track" class="muted">Track: Loading...</div>
+          <div class="badge" id="student-badge">Loading...</div>
+          <div id="student-track" class="muted">Track: Loading...</div>
         </div>
       </header>
 
       <section class="card">
         <div class="toolbar">
-          <label><h4>Year <select class="sel" id="sel-year"></select></h4></label>
-          <label><h4>Semester <select class="sel" id="sel-semester"></select></h4></label>
-          <label><h4>Track <select class="sel" id="sel-track" disabled></select></h4></label>
+          <label>
+            <h4>Year <select class="sel" id="sel-year"></select></h4>
+          </label>
+          <label>
+            <h4>Semester <select class="sel" id="sel-semester"></select></h4>
+          </label>
+          <label>
+            <h4>Track <select class="sel" id="sel-track" disabled></select></h4>
+          </label>
         </div>
 
         <div class="tbl-head">Courses for Selected Term</div>
@@ -65,7 +74,9 @@
             </tr>
           </thead>
           <tbody id="grade-entry-body">
-             <tr><td colspan="4" class="text-center muted">Loading courses...</td></tr>
+            <tr>
+              <td colspan="4" class="text-center muted">Loading courses...</td>
+            </tr>
           </tbody>
         </table>
 
@@ -86,21 +97,33 @@
             </tr>
           </thead>
           <tbody id="elective-entry-body">
-             <tr><td colspan="6" class="text-center muted">Loading electives...</td></tr>
+            <tr>
+              <td colspan="6" class="text-center muted">Loading electives...</td>
+            </tr>
           </tbody>
         </table>
 
         <button class="addbtn" id="add-free-elective-btn" style="margin-top:15px;">+ Add Free Elective</button>
 
         <footer class="ft">
-          <div class="stat"><div>Total Credit (Term)</div><b id="term-total-credit">0</b></div>
-          <div class="stat"><div>Credit Earned (Term)</div><b id="term-earned-credit">0</b></div>
-          <div class="stat"><div>Estimated Term GPA</div><b id="term-gpa">0.00</b></div>
+          <div class="stat">
+            <div>Total Credit (Term)</div><b id="term-total-credit">0</b>
+          </div>
+          <div class="stat">
+            <div>Credit Earned (Term)</div><b id="term-earned-credit">0</b>
+          </div>
+          <div class="stat">
+            <div>Estimated Term GPA</div><b id="term-gpa">0.00</b>
+          </div>
         </footer>
-      </section> </main>
+      </section>
+    </main>
   </div>
 
-  <script src="js/curriculum-master.js"></script>
+
   <script src="js/user.js"></script>
-  <script src="js/grade-entry.js"></script> <script src="js/menu-toggle.js"></script> </body>
+  <script src="js/grade-entry.js"></script>
+  <script src="js/menu-toggle.js"></script>
+</body>
+
 </html>

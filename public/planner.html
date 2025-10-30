@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Planner | Credit Wise</title>
-  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 
 <body class="bg user-page">
@@ -23,7 +24,8 @@
   <div class="layout">
     <aside class="sidebar" id="sidebar">
       <div class="side-title">
-        <div class="hat"></div> <div>Credit Wise 🎓</div>
+        <div class="hat"></div>
+        <div>Credit Wise 🎓</div>
         <button class="hamburger side-close" id="closeMenu" aria-label="Close menu">✕</button>
       </div>
       <nav>
@@ -42,9 +44,9 @@
 
       <header class="page-head">
         <h2>Semester Planner</h2>
-       <div class="user-info-header">
-            <div class="badge" id="student-badge">Loading...</div>
-            <div id="student-track" class="muted">Track: Loading...</div>
+        <div class="user-info-header">
+          <div class="badge" id="student-badge">Loading...</div>
+          <div id="student-track" class="muted">Track: Loading...</div>
         </div>
       </header>
 
@@ -59,7 +61,7 @@
         </div>
 
         <div id="course-list-container">
-          </div>
+        </div>
 
         <div class="center">
           <button class="addbtn" id="openAddCourseModal">＋ Add Course</button>
@@ -67,7 +69,8 @@
 
         <div class="est">Estimated Semester GPS: <span id="estimated-gps">0.00</span></div>
 
-      </section> </main>
+      </section>
+    </main>
   </div>
 
   <dialog id="gradeCalcModal">
@@ -84,21 +87,23 @@
           </div>
 
           <fieldset class="radio" style="margin:6px 0 10px; border: none; padding: 0;">
-            <legend style="font-weight: 600; margin-bottom: 5px; font-size: 14px; color: var(--text-secondary);">Grading Scale:</legend>
+            <legend style="font-weight: 600; margin-bottom: 5px; font-size: 14px; color: var(--text-secondary);">Grading
+              Scale:</legend>
             <label><input type="radio" name="grading_scale" value="AF" checked /> Standard A-F</label>
             <label><input type="radio" name="grading_scale" value="SU" /> S/U Grading</label>
           </fieldset>
 
           <section class="components">
-             <h4 style="margin-bottom: 5px; font-size: 14px; color: var(--text-secondary);">Components:</h4>
+            <h4 style="margin-bottom: 5px; font-size: 14px; color: var(--text-secondary);">Components:</h4>
             <div class="comp-row" style="font-weight:700; color:var(--text-secondary); font-size: 13px;">
               <span>Component Name</span>
               <span>Weight (%)</span>
               <span>Max Score</span>
               <span>Your Score</span>
-              <span></span> </div>
+              <span></span>
+            </div>
             <div id="compZone">
-              </div>
+            </div>
             <button class="pill-btn" id="addComp" type="button" style="margin-top: 8px;">+ Add Component</button>
           </section>
 
@@ -116,5 +121,9 @@
     </div>
   </dialog>
 
-  <script src="js/curriculum-master.js"></script> <script src="js/user.js"></script> <script src="js/planner.js"></script> <script src="js/menu-toggle.js"></script> </body>
+  <script src="js/user.js"></script>
+  <script src="js/planner.js"></script>
+  <script src="js/menu-toggle.js"></script>
+</body>
+
 </html>

@@ -1,85 +1,93 @@
 // server.js (แก้ไขเพื่อใช้ Router และ API ก่อน Static Files)
+
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { Pool } from "pg";
 import cors from "cors";
-import usersRoutes from './routes/users.js';
-import adminRoutes from './routes/admin.js';
-// Note: bcryptjs and jwt are now handled inside the router files
 
-// Import API Routers
-// *** สำคัญ: ต้องสร้างไฟล์เหล่านี้ก่อนในโฟลเดอร์ ./routes/ ***
-import authRoutes from './routes/auth.js';
-// import usersRoutes from './routes/users.js';
-// import adminRoutes from './routes/admin.js'; 
+// ===== Import Routers =====
+import authRoutes from "./routes/auth.js";
+import usersRoutes from "./routes/users.js";
+import adminRoutes from "./routes/admin.js";
 
-// โหลดตัวแปรสภาพแวดล้อมจาก .env
+// ===== Setup Environment =====
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ----------------------------------------------------
-// 1. Database Connection Setup (Pool)
-// ----------------------------------------------------
+// ===== Database Connection =====
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
-  database: process.env.DB_DATABASE, 
+  database: process.env.DB_DATABASE,
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT,
 });
 
 pool.connect((err, client, release) => {
-    if (err) {
-        return console.error("❌ Error connecting to PostgreSQL:", err.stack);
-    }
-    client.query("SELECT NOW()", (err, res) => {
-        release();
-        if (err) {
-            console.error("❌ Error executing initial query:", err.stack);
-        } else {
-            console.log("✅ Successfully connected to PostgreSQL at:", res.rows[0].now);
-        }
-    });
+  if (err) {
+    return console.error("❌ Error connecting to PostgreSQL:", err.stack);
+  }
+  client.query("SELECT NOW()", (err, res) => {
+    release();
+    if (err) console.error("❌ Error executing initial query:", err.stack);
+    else console.log("✅ PostgreSQL connected:", res.rows[0].now);
+  });
 });
 
+// ===== Middleware =====
+app.use(express.json());
+app.use(cors());
 
-// ----------------------------------------------------
-// 2. Middleware
-// ----------------------------------------------------
-app.use(express.json()); // อนุญาตให้ Server รับ JSON Body (สำคัญสำหรับ Login)
-app.use(cors()); 
+// ===== API Routes (must come before static files) =====
+app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
+app.use("/api/admin", adminRoutes);
 
-
-// ----------------------------------------------------
-// 3. API Routes (*** ต้องอยู่ก่อน Static Files ***)
-// ----------------------------------------------------
-
-// Route สำหรับ Login, Register
-app.use('/api/auth', authRoutes); 
-
-// Route สำหรับ Users (เช่น /api/users/me)
-app.use('/api/users', usersRoutes);
-
-// Route สำหรับ Admin (เช่น /api/admin/courses)
-app.use('/api/admin', adminRoutes); 
-
-
-// ----------------------------------------------------
-// 4. Static File Serving (ย้ายมาอยู่ส่วนท้ายสุด)
-// ----------------------------------------------------
-
-// Serve all static files in /public
+// ===== Static File Serving =====
 app.use(express.static(path.join(__dirname, "public")));
 
-// Serve index.html for all routes (SPA fallback)
-app.get(/.*/, (req, res) => {
+// ===== Fallback =====
+// Use a middleware handler instead of a route pattern string to avoid
+// path-to-regexp parsing errors (some versions of express + path-to-regexp
+// will throw on patterns like "*"). Only respond to GET requests here.
+app.use((req, res, next) => {
+  // If this looks like an API request, return a 404 JSON response
+  if (req.path.startsWith("/api")) {
+    console.warn("❌ API route not found:", req.path);
+    return res.status(404).json({ error: "API route not found" });
+  }
+
+  // Short-circuit missing favicon requests so they don't fall back to index.html
+  if (req.path === '/favicon.ico') {
+    // If you prefer serving a real favicon, place one at public/favicon.ico.
+    return res.status(204).end();
+  }
+
+  // Short-circuit common well-known probes (e.g. Chrome DevTools local probe)
+  // These are not app routes; return 204 No Content so they don't fall back
+  // to index.html and clutter logs. If you need any specific .well-known files
+  // (e.g. for verification), place them under public/.well-known/ so
+  // express.static will serve them.
+  if (req.path.startsWith('/.well-known')) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('⚠️ Ignoring .well-known probe:', req.url);
+    }
+    return res.status(204).end();
+  }
+
+  // Only serve index.html for GET requests (leave other methods to next handlers)
+  if (req.method !== 'GET') return next();
+
+  if (process.env.NODE_ENV !== 'production') {
+    console.log("⚠️ Fallback to index.html for path:", req.url);
+  }
+
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 

@@ -1,8 +1,9 @@
 // js/admin.js
+const token = localStorage.getItem('cw_token');
 fetch('/api/users/me', { // Or other endpoints
-  headers: {
-    'Authorization': `Bearer ${token}` // Include the token
-  }
+    headers: {
+        'Authorization': `Bearer ${token}` // Include the token
+    }
 })
 .then(response => {
   if (response.status === 401 || response.status === 403) {
@@ -156,30 +157,34 @@ fetch('/api/users/me', { // Or other endpoints
 
     /** Loads and displays the logged-in admin's name. */
     function loadAdminName() {
-        try {
-            if (typeof getCurrentUserData !== 'function') {
-                throw new Error('getCurrentUserData function not found. Ensure user.js is loaded before admin.js.');
-            }
-            const userData = getCurrentUserData(); // Assumes user.js provides this based on localStorage
-            const adminNameElement = document.getElementById('admin-name');
+        async function loadAdminName() {
+            try {
+                if (typeof getCurrentUserData !== 'function') {
+                    throw new Error('getCurrentUserData function not found. Ensure user.js is loaded before admin.js.');
+                }
+                const userData = await getCurrentUserData(); // Await the async fetch
+                const adminNameElement = document.getElementById('admin-name');
 
-            if (adminNameElement) { // Only proceed if the element exists
-                if (userData && userData.info && userData.info.role === 'admin') {
-                    const nameParts = userData.info.name.split('(');
-                    adminNameElement.textContent = `(${nameParts[0].trim()})`;
-                } else {
-                    // Could happen if localStorage is cleared or role is wrong
-                    console.warn("Could not find valid admin user data.");
-                    adminNameElement.textContent = '(Admin)'; // Default fallback
+                if (adminNameElement) { // Only proceed if the element exists
+                    if (userData && userData.info && userData.info.role === 'admin') {
+                        const nameParts = (userData.info.name || '').split('(');
+                        adminNameElement.textContent = `(${nameParts[0].trim()})`;
+                    } else {
+                        // Could happen if localStorage is cleared or role is wrong
+                        console.warn("Could not find valid admin user data.");
+                        adminNameElement.textContent = '(Admin)'; // Default fallback
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading admin name:", error);
+                const adminNameElement = document.getElementById('admin-name');
+                if (adminNameElement) {
+                    adminNameElement.textContent = '(Error)';
                 }
             }
-        } catch (error) {
-            console.error("Error loading admin name:", error);
-            const adminNameElement = document.getElementById('admin-name');
-            if (adminNameElement) {
-                adminNameElement.textContent = '(Error)';
-            }
         }
+        // call the async loader
+        loadAdminName();
     }
 
     // --- Initialization ---

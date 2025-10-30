@@ -54,12 +54,9 @@
 
       <section class="search-bar-container">
         <select id="filterTrack" aria-label="Filter by Track">
+          <!-- Populated by js/admin-curriculum.js.populateTrackSelects() -->
           <option value="">All Tracks</option>
-          <option value="CORE">Core Courses</option>
-          <option value="SD">Software Dev</option>
-          <option value="ITI">IT Infra</option>
-          <option value="MM">Multimedia</option>
-          </select>
+        </select>
         <select id="filterYear" aria-label="Filter by Year">
           <option value="">All Years</option>
           <option value="1">Year 1</option>
@@ -114,9 +111,10 @@
                 <option value="Free_Elective">Free Elective</option>
                 <option value="Coop">Co-op</option>
              </select>
-             <select name="track" id="courseTrack" class="ip">
-                 <option value="CORE">CORE (Required for All)</option>
-                 </select>
+       <select name="track" id="courseTrack" class="ip">
+         <!-- Populated by js/admin-curriculum.js.populateTrackSelects() -->
+         <option value="CORE">CORE (Required for All)</option>
+       </select>
              <input class="ip" name="credit_format" id="courseFormat" placeholder="e.g., 3(2-2-5)">
 
           </div>
@@ -129,7 +127,6 @@
     </div>
   </dialog>
 
-  <script src="js/curriculum-master.js"></script>
   
   <script src="js/user.js"></script>
 

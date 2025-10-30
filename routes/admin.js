@@ -10,12 +10,29 @@ const router = express.Router();
 router.use(authMiddleware);
 router.use(adminMiddleware);
 
-// GET /api/admin/students (ดึงข้อมูลนักศึกษาทั้งหมด)
+// GET /api/admin/students (ดึงข้อมูลนักศึกษาทั้งหมด) with aggregate credits and latest GPAX
 router.get('/students', async (req, res) => {
   try {
     const result = await query(
-      `SELECT id, username, name, track_id, study_plan, current_year, current_semester
-       FROM users WHERE role = 'student' ORDER BY username`
+      `SELECT u.id, u.username, u.name, u.track_id, u.study_plan, u.current_year, u.current_semester,
+              COALESCE(tc.total_credits, 0) AS total_credits,
+              COALESCE(ah.latest_gpax, 0) AS gpax,
+              COALESCE(ah.latest_term_gpa, 0) AS latest_term_gpa
+       FROM users u
+       LEFT JOIN (
+         SELECT user_id, SUM(COALESCE(ug.credit, c.credit, 0)) AS total_credits
+         FROM user_grades ug
+         LEFT JOIN courses c ON ug.course_code = c.code
+         GROUP BY user_id
+       ) tc ON tc.user_id = u.id
+       LEFT JOIN (
+         SELECT ah1.user_id, ah1.gpax AS latest_gpax, ah1.term_gpa AS latest_term_gpa
+         FROM academic_history ah1
+         WHERE ah1.id IN (
+           SELECT MAX(id) FROM academic_history ah2 WHERE ah2.user_id = ah1.user_id GROUP BY user_id
+         )
+       ) ah ON ah.user_id = u.id
+       WHERE u.role = 'student' ORDER BY u.username`
     );
     res.json(result.rows);
   } catch (err) {
@@ -90,6 +107,39 @@ router.post('/courses', async (req, res) => {
         return res.status(400).json({ error: 'Course code already exists' });
     }
     res.status(500).json({ error: 'Failed to add course' });
+  }
+});
+
+// PUT /api/admin/courses/:id (อัปเดตวิชา)
+router.put('/courses/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const { code, name, credit, credit_format, type, track_id, year, semester } = req.body;
+  if (!Number.isFinite(id)) return res.status(400).json({ error: 'Invalid course id' });
+  try {
+    const result = await query(
+      `UPDATE courses SET code = $1, name = $2, credit = $3, credit_format = $4, type = $5, track_id = $6, year = $7, semester = $8
+       WHERE id = $9 RETURNING *`,
+      [code, name, credit, credit_format, type, track_id, year, semester, id]
+    );
+    if (result.rows.length === 0) return res.status(404).json({ error: 'Course not found' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Admin update course error:', err);
+    res.status(500).json({ error: 'Failed to update course' });
+  }
+});
+
+// DELETE /api/admin/courses/:id (ลบวิชา)
+router.delete('/courses/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  if (!Number.isFinite(id)) return res.status(400).json({ error: 'Invalid course id' });
+  try {
+    const del = await query('DELETE FROM courses WHERE id = $1 RETURNING *', [id]);
+    if (del.rows.length === 0) return res.status(404).json({ error: 'Course not found' });
+    res.json({ message: 'Course deleted', course: del.rows[0] });
+  } catch (err) {
+    console.error('Admin delete course error:', err);
+    res.status(500).json({ error: 'Failed to delete course' });
   }
 });
 

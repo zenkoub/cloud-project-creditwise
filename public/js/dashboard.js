@@ -91,11 +91,10 @@ function updateDashboardInfo(userData) {
   }
 
   const history = userData.academic_history || [];
-  const trackId = userData.info.track_id;
-  // NOTE: Assuming window.TRACKS_INFO is still loaded via curriculum-master.js
-  const trackName = (trackId && trackId !== "N/A" && window.TRACKS_INFO && window.TRACKS_INFO[trackId])
-                    ? window.TRACKS_INFO[trackId].full_name
-                    : '(No Track Selected)';
+  // Prefer server-provided full track name if available
+  const trackName = userData.info.track_full_name || (userData.info.track_id && userData.info.track_id !== "N/A" && window.TRACKS_INFO && window.TRACKS_INFO[userData.info.track_id]
+                    ? window.TRACKS_INFO[userData.info.track_id].full_name
+                    : '(No Track Selected)');
 
   document.getElementById('student-badge').textContent =
     `${userData.info.name || 'N/A'} • ${userData.info.username || 'N/A'}`; // ใช้ username แทน ID (ที่อาจจะเป็นเลขฐานข้อมูล)

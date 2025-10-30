@@ -37,56 +37,59 @@ function splitName(fullName = "") {
 // --- Data Fetching & Processing ---
 // *** เปลี่ยนฟังก์ชันนี้ให้เป็น async และดึงจาก API ***
 async function getAllStudentsFromAPI() {
-    const token = localStorage.getItem('cw_token');
-    if (!token) return [];
+  const token = localStorage.getItem('cw_token');
+  if (!token) return [];
 
-    try {
-        const response = await fetch('/api/admin/students', {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+  try {
+    const response = await fetch('/api/admin/students', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
 
-        if (!response.ok) {
-            if (response.status === 403) throw new Error("Admin access denied by server.");
-            throw new Error('Failed to fetch student list.');
-        }
-
-        const students = await response.json(); // Array of student objects (with info only)
-        
-        // NOTE: ข้อมูล GPAX, History, Credit ไม่ได้ถูกส่งมาโดยตรง ต้องคำนวณหรือโหลดแยก
-        // ในเวอร์ชั่นนี้ เราจะใช้ค่า Mock/Default เนื่องจากยังไม่มี API ที่ดึงประวัติ GPAX ทั้งหมด
-        
-        return students.map(s => {
-            // สมมติ: History ถูกส่งมาในรูปแบบ Array ใน response (ถ้า API ถูกปรับปรุง)
-            // แต่เนื่องจาก API ปัจจุบันส่งแต่ Info เราจะใช้ค่า Default
-            const academic_history = []; // Default to empty
-            const latestHistory = academic_history.length > 0 ? academic_history[academic_history.length - 1] : null;
-            const gpax = latestHistory ? (parseFloat(latestHistory.gpax) || 0) : 0.00;
-            const totalCredit = 0; // ต้องโหลดจาก API แยก
-
-            const statusInfo = calculateStatus(academic_history);
-            const trackDisplay = (s.track_id && s.track_id !== "N/A") ? s.track_id : "-";
-            const { name, surname } = splitName(s.name);
-
-            return {
-                id: s.id, // ใช้ ID ฐานข้อมูลแทน Student ID เดิม (อาจต้องปรับในอนาคต)
-                username: s.username, // ใช้ username (Student ID) ในการแสดงผล
-                name: name,
-                surname: surname,
-                email: `${s.username}@example.com`,
-                credit: totalCredit,
-                gpa: gpax.toFixed(2),
-                status: statusInfo.status,
-                statusCls: statusInfo.cls,
-                track: trackDisplay,
-                year: s.current_year !== undefined ? s.current_year : "-"
-            };
-        });
-
-    } catch (error) {
-        console.error("Error fetching students:", error);
-        alert(error.message);
-        return [];
+    if (!response.ok) {
+      if (response.status === 403) throw new Error("Admin access denied by server.");
+      throw new Error('Failed to fetch student list.');
     }
+
+    const students = await response.json(); // Array of student objects
+
+    return students.map(s => {
+      // Prefer latest_term_gpa + gpax returned by the admin endpoint.
+      // If those are not present, fall back to any academic_history array.
+      const hasLatest = s.latest_term_gpa !== undefined && s.latest_term_gpa !== null;
+      let academic_history = [];
+      if (hasLatest || (s.gpax !== undefined && s.gpax !== null)) {
+        academic_history = [{ term_gpa: Number(s.latest_term_gpa) || 0, gpax: Number(s.gpax) || 0 }];
+      } else if (Array.isArray(s.academic_history) && s.academic_history.length > 0) {
+        academic_history = s.academic_history;
+      }
+
+      const gpax = (s.gpax !== undefined && s.gpax !== null) ? Number(s.gpax) : (academic_history.length > 0 ? Number(academic_history[academic_history.length - 1].gpax || 0) : 0);
+      const totalCredit = s.total_credits !== undefined && s.total_credits !== null ? Number(s.total_credits) : 0;
+
+      const statusInfo = calculateStatus(academic_history);
+      const trackDisplay = (s.track_id && s.track_id !== "N/A") ? s.track_id : "-";
+      const { name, surname } = splitName(s.name);
+
+      return {
+        id: s.id,
+        username: s.username,
+        name: name,
+        surname: surname,
+        email: `${s.username}@example.com`,
+        credit: totalCredit,
+        gpa: gpax.toFixed(2),
+        status: statusInfo.status,
+        statusCls: statusInfo.cls,
+        track: trackDisplay,
+        year: s.current_year !== undefined ? s.current_year : "-"
+      };
+    });
+
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    alert(error.message);
+    return [];
+  }
 }
 
 // --- Rendering (Same as original) ---
