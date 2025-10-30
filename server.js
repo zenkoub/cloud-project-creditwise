@@ -13,7 +13,6 @@ import pool from './db.js'; // <-- IMPORT THE POOL
 import authRoutes from "./routes/auth.js";
 import usersRoutes from "./routes/users.js";
 import adminRoutes from "./routes/admin.js";
-import filesRoutes from "./routes/files.js";
 
 // ===== Setup Environment =====
 dotenv.config();
